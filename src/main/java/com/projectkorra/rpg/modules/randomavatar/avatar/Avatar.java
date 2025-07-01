@@ -2,6 +2,7 @@ package com.projectkorra.rpg.modules.randomavatar.avatar;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.rpg.modules.randomavatar.util.EndReason;
 import com.projectkorra.rpg.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,17 +23,16 @@ public class Avatar {
         this.uuid = uuid;
         this.mainElement = mainElement;
         this.subElements = new ArrayList<>(); // Init empty List in case of no sub elements
-        this.chosenTime = Instant.now();
 
         if (!subElements.isEmpty()) {
             this.subElements.addAll(subElements);
         }
     }
 
-    public Avatar(UUID uuid, Element mainElement, List<Element.SubElement> subElements, Instant chosenTime) {
+    public Avatar(UUID uuid, Element mainElement, List<Element.SubElement> subElements, Instant chosenTime, Instant endTime, EndReason reason) {
         this(uuid, mainElement, subElements);
-
         this.chosenTime = chosenTime;
+
     }
 
     public void handleInitiation() {
@@ -50,13 +50,13 @@ public class Avatar {
 
         Element element = bendingPlayer.getElements().getFirst();
         List<Element.SubElement> subElement = bendingPlayer.getSubElements();
-        Instant chosenTime = Instant.now();
+        this.chosenTime = Instant.now();
 
-        if (element == null || subElement == null || chosenTime == null) {
+        if (element == null || subElement == null || this.chosenTime == null) {
             throw new NullPointerException("Couldn't initiate new Avatar! Element, SubElement or ChosenTime is null!");
         }
 
-        AvatarManager.storeAvatar(player.getUniqueId(), element, subElement, chosenTime);
+        AvatarManager.storeAvatar(player.getUniqueId(), element, subElement, this.chosenTime);
 
         removeAllElements(bendingPlayer);
         addAvatarElements(bendingPlayer);
@@ -93,7 +93,7 @@ public class Avatar {
 
     }
 
-    public PreviousAvatar getPreviousAvatar(UUID previousAvatarUUID) {
+    public Avatar getPreviousAvatar(UUID previousAvatarUUID) {
         return AvatarManager.getPreviousAvatars().get(previousAvatarUUID) != null ? AvatarManager.getPreviousAvatars().get(previousAvatarUUID) : null;
     }
 
@@ -111,5 +111,9 @@ public class Avatar {
 
     public Instant getChosenTime() {
         return chosenTime;
+    }
+
+    public void setChosenTime(Instant chosenTime) {
+        this.chosenTime = chosenTime;
     }
 }
