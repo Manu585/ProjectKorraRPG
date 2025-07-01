@@ -5,6 +5,7 @@ import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.modules.randomavatar.util.EndReason;
 import com.projectkorra.rpg.storage.TableCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,7 +23,7 @@ public class AvatarManager {
     private static final String CONFIG_PATH = "Modules.RandomAvatar.";
 
     private static HashMap<UUID, Avatar> CURRENT_AVATARS;
-    private static HashMap<UUID, PreviousAvatar> PREVIOUS_AVATARS;
+    private static HashMap<UUID, Avatar> PREVIOUS_AVATARS;
 
     public AvatarManager() {
         CURRENT_AVATARS = fillAvatarMap();
@@ -66,7 +67,7 @@ public class AvatarManager {
 
         DBConnection.sql.modifyQuery(query);
 
-        CURRENT_AVATARS.put(uuid, new Avatar(uuid, mainElement, subElements, chosenTime));
+        CURRENT_AVATARS.put(uuid, new Avatar(uuid, mainElement, subElements));
     }
 
     /**
@@ -109,7 +110,7 @@ public class AvatarManager {
                     }
                 }
 
-                avatars.put(uuid, new Avatar(uuid, Element.fromString(mainElementName), subElements, chosenTime));
+                avatars.put(uuid, new Avatar(uuid, Element.fromString(mainElementName), subElements));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -118,8 +119,8 @@ public class AvatarManager {
         return avatars;
     }
 
-    private HashMap<UUID, PreviousAvatar> fillPreviousAvatarMap() {
-        HashMap<UUID, PreviousAvatar> previousAvatars = new HashMap<>();
+    private HashMap<UUID, Avatar> fillPreviousAvatarMap() {
+        HashMap<UUID, Avatar> previousAvatars = new HashMap<>();
 
         try {
             ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_PASTLIVES_TABLE);
@@ -130,7 +131,7 @@ public class AvatarManager {
                 String subElementNames = rs.getString("sub_elements");
                 Instant chosenTime = rs.getTimestamp("chosen_time").toInstant();
                 Instant endTime = rs.getTimestamp("end_time").toInstant();
-                String endReason = rs.getString("end_reason");
+                EndReason endReason = EndReason.valueOf(rs.getString("end_reason"));
 
                 List<Element.SubElement> subElements = new ArrayList<>();
                 if (subElementNames != null) {
@@ -139,7 +140,7 @@ public class AvatarManager {
                     }
                 }
 
-                previousAvatars.put(uuid, new PreviousAvatar(uuid, Element.fromString(mainElementName), subElements, chosenTime, endTime, endReason));
+                previousAvatars.put(uuid, new Avatar(uuid, Element.fromString(mainElementName), subElements, chosenTime, endTime, endReason));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -152,7 +153,7 @@ public class AvatarManager {
         return CURRENT_AVATARS;
     }
 
-    public static HashMap<UUID, PreviousAvatar> getPreviousAvatars() {
+    public static HashMap<UUID, Avatar> getPreviousAvatars() {
         return PREVIOUS_AVATARS;
     }
 }
