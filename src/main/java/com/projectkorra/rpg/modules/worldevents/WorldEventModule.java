@@ -1,5 +1,6 @@
 package com.projectkorra.rpg.modules.worldevents;
 
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
 import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventModificationListener;
@@ -19,8 +20,8 @@ public class WorldEventModule extends Module {
 	private WorldEventScheduler worldEventScheduler;
 	private ScheduleStorage scheduleStorage;
 
-	public WorldEventModule() {
-		super("WorldEvents");
+	public WorldEventModule(ProjectKorraRPG plugin) {
+		super(plugin, "WorldEvents");
 	}
 
 	@Override

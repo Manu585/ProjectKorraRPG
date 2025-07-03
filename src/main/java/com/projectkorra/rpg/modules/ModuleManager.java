@@ -1,5 +1,6 @@
 package com.projectkorra.rpg.modules;
 
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.elementassignments.ElementAssignModule;
 import com.projectkorra.rpg.modules.leveling.LevelingModule;
 import com.projectkorra.rpg.modules.randomavatar.AvatarCycleModule;
@@ -16,11 +17,11 @@ public class ModuleManager {
 	private final AvatarCycleModule avatarCycleModule;
 	private final ElementAssignModule elementAssignModule;
 
-	public ModuleManager() {
-		modules.add(worldEventModule = new WorldEventModule());
-		modules.add(levelingModuleModule = new LevelingModule());
-		modules.add(avatarCycleModule = new AvatarCycleModule());
-		modules.add(elementAssignModule = new ElementAssignModule());
+	public ModuleManager(ProjectKorraRPG plugin) {
+		modules.add(worldEventModule = new WorldEventModule(plugin));
+		modules.add(levelingModuleModule = new LevelingModule(plugin));
+		modules.add(avatarCycleModule = new AvatarCycleModule(plugin));
+		modules.add(elementAssignModule = new ElementAssignModule(plugin));
 	}
 
 	public void enableModules() {

@@ -1,5 +1,6 @@
 package com.projectkorra.rpg.modules.randomavatar;
 
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.randomavatar.listeners.AvatarListener;
 import com.projectkorra.rpg.modules.randomavatar.manager.AvatarManager;
@@ -8,8 +9,8 @@ public class AvatarCycleModule extends Module {
     private AvatarManager avatarManager;
     private AvatarListener avatarListener;
 
-    public AvatarCycleModule() {
-        super("RandomAvatar");
+    public AvatarCycleModule(ProjectKorraRPG plugin) {
+        super(plugin, "RandomAvatar");
 
     }
 

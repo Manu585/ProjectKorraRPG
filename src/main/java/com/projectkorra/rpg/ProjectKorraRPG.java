@@ -26,9 +26,9 @@ public class ProjectKorraRPG extends JavaPlugin {
 		new ConfigManager();
 		new TableCreator();
 
-		moduleManager = new ModuleManager();
+		moduleManager = new ModuleManager(this);
 
-		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), plugin);
+		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(this), this);
 
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 		if (provider != null) {
@@ -44,7 +44,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 		// Metrics
 		try {
-			MetricsLite metrics = new MetricsLite(plugin);
+			MetricsLite metrics = new MetricsLite(this);
 			metrics.start();
 		} catch (IOException e) {
 			getLogger().severe("Failed to submit stats to bStats!" + e.getMessage());
