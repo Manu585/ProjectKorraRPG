@@ -55,7 +55,7 @@ public class AbilityMenu extends ChestGui {
             if (bPlayer.getElements().size() >= 2) {
                 new ElementPicker((Player) event.getWhoClicked()).show(event.getWhoClicked());
             } else {
-                new MainGui(bPlayer.getPlayer()).show(event.getWhoClicked());
+                new MainGui(bPlayer.getPlayer()).open((Player) event.getWhoClicked());
             }
         });
 

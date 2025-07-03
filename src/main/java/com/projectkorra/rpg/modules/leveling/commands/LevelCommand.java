@@ -21,7 +21,7 @@ public class LevelCommand extends RPGCommand {
 		}
 
 		if (args.isEmpty()) {
-			new MainGui(player).show(player);
+			new MainGui(player).open(player);
 		} else {
 			help(sender, true);
 		}

@@ -1,12 +1,10 @@
 package com.projectkorra.rpg.modules.leveling.gui.master;
 
-import com.github.stefvanschie.inventoryframework.gui.GuiItem;
-import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
-import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.util.ChatUtil;
-import com.projectkorra.rpg.modules.leveling.gui.util.GuiItems;
+import com.projectkorra.rpg.util.guiframework.GUI;
+import com.projectkorra.rpg.util.guiframework.GuiItem;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,29 +12,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-public class MainGui extends ChestGui {
-    private static final int WIDTH = 9;
-    private static final int HEIGHT = 3;
-
-    private final StaticPane background;
-
+public class MainGui extends GUI {
+    private static final int ROWS = 3;
     private final Player player;
 
     public MainGui(Player player) {
-        super(HEIGHT, ChatUtil.color("Leveling"));
+        super(ROWS, ChatUtil.color("Leveling"));
         this.player = player;
 
-        setOnGlobalClick(event -> event.setCancelled(true));
+        open(player);
+        disableAllClicks();
 
-        background = new StaticPane(0, 0, WIDTH, HEIGHT);
-        background.fillWith(GuiItems.glassPaneItem().getItem());
-
-        for (int y = 0; y < HEIGHT; y++) {
-            background.addItem(GuiItems.twistedVinesItem(), 0, y);
-            background.addItem(GuiItems.twistedVinesItem(), WIDTH - 1, y);
+        for (int i = 0; i < getInventory().getSize(); i++) {
+            if (i == 5) continue;
+            getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
-
-        addPane(background);
 
         this.setupGui();
     }
@@ -62,19 +52,7 @@ public class MainGui extends ChestGui {
             }
         });
 
-        background.addItem(shardButton, 2, 1);
-
-        GuiItem headItem = new GuiItem(getHead(), event -> {
-            event.setCancelled(true);
-        });
-
-        background.addItem(headItem, 4, 1);
-
-        GuiItem starButton = new GuiItem(netherStarItem(), event -> {
-                    event.setCancelled(true);
-        });
-
-        background.addItem(starButton, 6, 1);
+        getInventory().setItem(5, shardButton.getItem());
     }
 
     private ItemStack amethystShardItem() {
