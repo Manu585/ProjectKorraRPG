@@ -10,10 +10,7 @@ import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.WorldEventB
 import com.projectkorra.rpg.modules.worldevents.util.display.chat.ChatDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.none.NoDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.scoreboard.ScoreboardDisplay;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -73,11 +70,12 @@ public class WorldEvent {
 				if (getConfig().getBoolean("PlayEventStartSound")) {
 					String soundName = getConfig().getString("EventStart.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
 
-					Sound eventStartSound = Sound.valueOf(soundName);
+					Sound eventStartSound = Registry.SOUNDS.get(NamespacedKey.minecraft(soundName));
 					float volume = (float) getConfig().getDouble("EventStart.Volume");
 					float pitch = (float) getConfig().getDouble("EventStart.Pitch");
 
-					player.getWorld().playSound(player.getLocation(), eventStartSound, volume, pitch);
+                    assert eventStartSound != null;
+                    player.getWorld().playSound(player.getLocation(), eventStartSound, volume, pitch);
 				}
 			}
 		}
@@ -103,11 +101,12 @@ public class WorldEvent {
 				if (getConfig().getBoolean("PlayEventStopSound")) {
 					String soundName = getConfig().getString("EventStop.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
 
-					Sound eventStopSound = Sound.valueOf(soundName.toUpperCase());
+					Sound eventStopSound = Registry.SOUNDS.get(NamespacedKey.minecraft(soundName));
 					float volume = (float) getConfig().getDouble("EventStop.Volume", 1.0);
 					float pitch = (float) getConfig().getDouble("EventStop.Pitch", 1.0);
 
-					player.getWorld().playSound(player.getLocation(), eventStopSound, volume, pitch);
+                    assert eventStopSound != null;
+                    player.getWorld().playSound(player.getLocation(), eventStopSound, volume, pitch);
 				}
 			}
 		}

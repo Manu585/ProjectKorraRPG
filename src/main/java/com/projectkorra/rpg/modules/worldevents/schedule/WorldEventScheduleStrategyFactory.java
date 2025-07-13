@@ -28,8 +28,8 @@ public class WorldEventScheduleStrategyFactory {
 					timeOfDay,
 					repeatDuration,
 					offsetDuration,
-					chance,
 					cooldown,
+					chance,
 					scheduleStorage
 			);
 
