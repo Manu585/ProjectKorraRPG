@@ -26,7 +26,7 @@ public class WorldEventModule extends Module {
 
 	@Override
 	public void enable() {
-		getPlugin().getLogger().info("Enabling WorldEvent module...");
+		this.getPlugin().getLogger().info("Enabling WorldEvent module...");
 
 		// Initialize all valid WorldEvents found in each config file in the WorldEvents directory
 		WorldEvent.initAllWorldEvents();
@@ -38,7 +38,7 @@ public class WorldEventModule extends Module {
 		this.scheduleStorage = new ScheduleStorage();
 
 		// Scheduler to make events start based on config
-		this.worldEventScheduler = new WorldEventScheduler(this.scheduleListener, this.scheduleStorage);
+		this.worldEventScheduler = new WorldEventScheduler(this.getPlugin(), this.scheduleStorage, this.scheduleListener);
 
 		// Create and Register Modification Listener
 		this.modificationListener = new WorldEventModificationListener(this.modificationService);
@@ -52,12 +52,12 @@ public class WorldEventModule extends Module {
 				this.scheduleListener
 		);
 
-		getPlugin().getLogger().info("WorldEvent module enabled successfully!");
+		this.getPlugin().getLogger().info("WorldEvent module enabled successfully!");
 	}
 
 	@Override
 	public void disable() {
-		getPlugin().getLogger().info("Disabling WorldEvent module...");
+		this.getPlugin().getLogger().info("Disabling WorldEvent module...");
 
 		// Cleanup Scheduler
 		if (this.worldEventScheduler != null) {
@@ -69,7 +69,7 @@ public class WorldEventModule extends Module {
 		try {
 			new ArrayList<>(WorldEvent.getActiveEvents()).forEach(WorldEvent::stopEvent);
 		} catch (Exception e) {
-			getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());
+			this.getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());
 		}
 
 		// Unregister ModificationListener
@@ -83,7 +83,7 @@ public class WorldEventModule extends Module {
 		WorldEvent.getAllEvents().clear();
 		WorldEvent.getAffectedPlayers().clear();
 
-		getPlugin().getLogger().info("WorldEvent module disabled successfully!");
+		this.getPlugin().getLogger().info("WorldEvent module disabled successfully!");
 	}
 
 	public WorldEventModificationListener getModificationListener() {

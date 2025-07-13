@@ -11,14 +11,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WorldEventScheduler {
-	private final Plugin plugin = ProjectKorraRPG.getPlugin();
 	private final Map<WorldEvent, ScheduledEventContext> scheduledEvents = new ConcurrentHashMap<>();
-	private WorldEventScheduleListener worldEventScheduleListener;
 	private final ScheduleStorage scheduleStorage;
+	private final Plugin plugin;
 
-	public WorldEventScheduler(WorldEventScheduleListener worldEventScheduleListener, ScheduleStorage scheduleStorage) {
-		this.worldEventScheduleListener = worldEventScheduleListener;
+	private WorldEventScheduleListener worldEventScheduleListener;
+
+	public WorldEventScheduler(ProjectKorraRPG plugin, ScheduleStorage scheduleStorage, WorldEventScheduleListener worldEventScheduleListener) {
+		this.plugin = plugin;
 		this.scheduleStorage = scheduleStorage;
+		this.worldEventScheduleListener = worldEventScheduleListener;
 
 		initSchedules();
 	}
@@ -146,7 +148,7 @@ public class WorldEventScheduler {
 	/**
 	 * ScheduledEventContext keeps all scheduling information about a single world event
 	 */
-	private static class ScheduledEventContext {
+	public static class ScheduledEventContext {
 		private final WorldEvent event;
 		private final WorldEventScheduleStrategy strategy;
 		private boolean active = false;
