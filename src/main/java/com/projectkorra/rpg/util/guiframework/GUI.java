@@ -1,15 +1,17 @@
 package com.projectkorra.rpg.util.guiframework;
 
+import com.projectkorra.rpg.util.guiframework.util.Slot;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class GUI implements InventoryHolder {
-    private final Map<Integer, GuiItem> allItems = new HashMap<>();
+    private final Map<Slot, GuiItem> allItems = new HashMap<>();
 
     private final Inventory inventory;
     private final int rows;
@@ -23,9 +25,9 @@ public abstract class GUI implements InventoryHolder {
         this.inventory = Bukkit.createInventory(this, rows * 9, title);
     }
 
-    public void setItem(int slot, GuiItem item) {
+    public void setItem(Slot slot, GuiItem item) {
         allItems.put(slot, item);
-        inventory.setItem(slot, item.getItem());
+        inventory.setItem(slot.getIndex(), item.getItem());
     }
 
     public void open(Player player) {
@@ -41,11 +43,11 @@ public abstract class GUI implements InventoryHolder {
     }
 
     @Override
-    public Inventory getInventory() {
+    public @NotNull Inventory getInventory() {
         return inventory;
     }
 
-    public Map<Integer, GuiItem> getAllItems() {
+    public Map<Slot, GuiItem> getAllItems() {
         return allItems;
     }
 
