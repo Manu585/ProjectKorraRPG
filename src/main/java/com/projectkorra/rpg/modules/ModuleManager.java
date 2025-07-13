@@ -6,11 +6,10 @@ import com.projectkorra.rpg.modules.leveling.LevelingModule;
 import com.projectkorra.rpg.modules.randomavatar.AvatarCycleModule;
 import com.projectkorra.rpg.modules.worldevents.WorldEventModule;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ModuleManager {
-	private final List<Module> modules = new ArrayList<>();
+	private final List<Module> modules;
 
 	private final WorldEventModule worldEventModule;
 	private final LevelingModule levelingModuleModule;
@@ -18,24 +17,25 @@ public class ModuleManager {
 	private final ElementAssignModule elementAssignModule;
 
 	public ModuleManager(ProjectKorraRPG plugin) {
-		modules.add(worldEventModule = new WorldEventModule(plugin));
-		modules.add(levelingModuleModule = new LevelingModule(plugin));
-		modules.add(avatarCycleModule = new AvatarCycleModule(plugin));
-		modules.add(elementAssignModule = new ElementAssignModule(plugin));
+		this.worldEventModule = new WorldEventModule(plugin);
+		this.levelingModuleModule = new LevelingModule(plugin);
+		this.avatarCycleModule = new AvatarCycleModule(plugin);
+		this.elementAssignModule = new ElementAssignModule(plugin);
+
+		this.modules = List.of(
+				worldEventModule,
+				levelingModuleModule,
+				avatarCycleModule,
+				elementAssignModule
+		);
 	}
 
 	public void enableModules() {
-		for (Module module : modules) {
-			if (module.isEnabled()) {
-				module.enable();
-			}
-		}
+		modules.forEach(Module::enable);
 	}
 
 	public void disableModules() {
-		for (Module module : modules) {
-			module.disable();
-		}
+		modules.forEach(Module::disable);
 	}
 
 	public List<Module> getModules() {

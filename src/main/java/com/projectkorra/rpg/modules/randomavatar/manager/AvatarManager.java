@@ -17,7 +17,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,7 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AvatarManager {
-    private final JavaPlugin plugin = ProjectKorraRPG.getPlugin();
+    private final ProjectKorraRPG plugin = ProjectKorraRPG.getPlugin();
 
     // In-memory caches
     public final Set<OfflinePlayer> recentPlayers;

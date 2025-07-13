@@ -8,7 +8,6 @@ import java.time.Duration;
 import static com.projectkorra.rpg.ProjectKorraRPG.luckPermsAPI;
 
 public class RPGMethods {
-	private static final ProjectKorraRPG plugin = ProjectKorraRPG.getPlugin();
 
 	/**
 	 * @param player     Player who will lose permission
@@ -37,6 +36,7 @@ public class RPGMethods {
 	public static void addPermission(Player player, String permission) {
 		if (luckPermsAPI == null)
 			return;
+
 		luckPermsAPI.getUserManager().getUser(player.getUniqueId()).data()
 				.add(Node.builder(permission).build());
 		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
@@ -52,7 +52,7 @@ public class RPGMethods {
 		// Can be in the formats like: 1s, 1m, 1h, 1d, 2d1h10s etc etc.
 		Duration duration = Duration.ZERO;
 		if (period == null || period.isEmpty()) {
-			plugin.getLogger().info("Invalid period string: " + period);
+			ProjectKorraRPG.getPlugin().getLogger().info("Invalid period string: " + period);
 			return duration;
 		}
 		String[] parts = period.split("(?<=\\D)(?=\\d)");
