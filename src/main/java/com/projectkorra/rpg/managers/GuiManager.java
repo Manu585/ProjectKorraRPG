@@ -2,6 +2,7 @@ package com.projectkorra.rpg.managers;
 
 import com.projectkorra.rpg.util.guiframework.GUI;
 import com.projectkorra.rpg.util.guiframework.GuiItem;
+import com.projectkorra.rpg.util.guiframework.util.Slot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,7 +28,7 @@ public class GuiManager implements Listener {
 
         if (gui == null || event.getInventory().getHolder() != gui) return;
 
-        GuiItem guiItem = gui.getAllItems().get(event.getRawSlot());
+        GuiItem guiItem = gui.getAllItems().get(Slot.fromIndex(event.getRawSlot()));
 
         if (gui.areClicksDisabled() && guiItem == null) {
             event.setCancelled(true);
