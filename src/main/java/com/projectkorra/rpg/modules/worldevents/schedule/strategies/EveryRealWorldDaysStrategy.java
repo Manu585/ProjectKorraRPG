@@ -16,8 +16,8 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
     private final LocalTime targetTime;
     private final Duration repeatInterval;
     private final Duration maxOffset;
-    private final double chance;
     private final Duration cooldown;
+    private final double chance;
     
     private final Random random = new Random();
     private BukkitTask task;
@@ -32,12 +32,12 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
      * @param chance     Probability of the event triggering when conditions are met (0.0-1.0)
      * @param cooldown  Minimum time between event triggers (e.g., 60 days)
      */
-    public EveryRealWorldDaysStrategy(LocalTime targetTime, Duration repeatInterval, Duration maxOffset, double chance, Duration cooldown, ScheduleStorage storage) {
+    public EveryRealWorldDaysStrategy(LocalTime targetTime, Duration repeatInterval, Duration maxOffset, Duration cooldown, double chance, ScheduleStorage storage) {
         this.targetTime = targetTime;
         this.repeatInterval = repeatInterval;
         this.maxOffset = maxOffset;
-        this.chance = chance;
         this.cooldown = cooldown;
+        this.chance = chance;
         this.storage = storage;
     }
     
@@ -196,12 +196,12 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
         return maxOffset;
     }
 
-    public double getChance() {
-        return chance;
-    }
-
     public Duration getCooldown() {
         return cooldown;
+    }
+
+    public double getChance() {
+        return chance;
     }
 
     public Random getRandom() {
