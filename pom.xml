@@ -17,10 +17,6 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
     </repositories>
     <dependencies>
         <!--Bukkit API-->
@@ -50,12 +46,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.17.0</version>
             <scope>provided</scope>
-        </dependency>
-        <!-- Inventory Framework -->
-        <dependency>
-            <groupId>com.github.stefvanschie.inventoryframework</groupId>
-            <artifactId>IF</artifactId>
-            <version>0.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -93,21 +83,7 @@
                 <version>3.6.0</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <relocations>
-                        <relocation>
-                            <pattern>com.github.stefvanschie.inventoryframework</pattern>
-                            <shadedPattern>com.projectkorra.rpg.inventoryframework</shadedPattern>
-                        </relocation>
-                    </relocations>
                 </configuration>
-		        <executions>
-		            <execution>
-		                <phase>package</phase>
-			            <goals>
-			                <goal>shade</goal>
-			            </goals>
-		            </execution>
-		        </executions>
 	        </plugin>
         </plugins>
     </build>

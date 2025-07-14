@@ -6,6 +6,8 @@ import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.metrics.MetricsLite;
 import com.projectkorra.rpg.modules.ModuleManager;
 import com.projectkorra.rpg.storage.TableCreator;
+import com.projectkorra.rpg.ui.service.InventoryEventListener;
+import com.projectkorra.rpg.ui.service.InventoryService;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -18,6 +20,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 	public static LuckPerms luckPermsAPI;
 
 	private ModuleManager moduleManager;
+	private InventoryService inventoryService;
 
 	@Override
 	public void onEnable() {
@@ -27,7 +30,9 @@ public class ProjectKorraRPG extends JavaPlugin {
 		new TableCreator();
 
 		moduleManager = new ModuleManager(this);
+		inventoryService = new InventoryService();
 
+		Bukkit.getServer().getPluginManager().registerEvents(new InventoryEventListener(inventoryService), this);
 		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(this), this);
 
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
@@ -54,6 +59,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		moduleManager.disableModules();
+		inventoryService.closeAll();
 	}
 
 	public static ProjectKorraRPG getPlugin() {
@@ -62,6 +68,10 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 	public static LuckPerms getLuckPermsAPI() {
 		return luckPermsAPI;
+	}
+
+	public InventoryService getInventoryService() {
+		return inventoryService;
 	}
 
 	public ModuleManager getModuleManager() {
