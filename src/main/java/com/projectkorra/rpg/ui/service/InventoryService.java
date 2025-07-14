@@ -15,7 +15,7 @@ public class InventoryService {
     public void open(Player player, InventoryUI ui) {
         InventoryUI old = openUis.put(player, ui);
 
-        // Close any prevously open menus for the player
+        // Close any prevously open menus
         if (old != null && old != ui) {
             old.onClose(player);
         }
@@ -35,9 +35,7 @@ public class InventoryService {
     }
 
     public void closeAll() {
-        for (Player player : openUis.keySet()) {
-            openUis.get(player).onClose(player);
-        }
+        openUis.forEach((p, ui) -> ui.onClose(p));
         openUis.clear();
     }
 

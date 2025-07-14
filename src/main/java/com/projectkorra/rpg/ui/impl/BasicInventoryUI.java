@@ -13,16 +13,14 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class BasicInventoryUI implements InventoryUI {
-    private final Map<Slot, ItemStack> items;
     private final Map<Slot, Consumer<InventoryClickEvent>> clickHandlers;
     private final Inventory inventory;
 
     public BasicInventoryUI(int rows, String title, Map<Slot, ItemStack> items, Map<Slot, Consumer<InventoryClickEvent>> clickHandlers) {
-        this.items = Map.copyOf(items);
         this.clickHandlers = Map.copyOf(clickHandlers);
         this.inventory = Bukkit.createInventory(this, rows * 9, title);
 
-        this.items.forEach((slot, stack) -> inventory.setItem(slot.index(), stack));
+        items.forEach((slot, stack) -> inventory.setItem(slot.index(), stack));
     }
 
     @Override
