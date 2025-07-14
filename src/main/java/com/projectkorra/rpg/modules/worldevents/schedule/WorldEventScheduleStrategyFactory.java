@@ -17,11 +17,11 @@ public class WorldEventScheduleStrategyFactory {
 		String rawType = config.getString("Schedule.Calendar", "REALTIME");
 		ScheduleType scheduleType = ScheduleType.fromString(rawType);
 
-		LocalTime timeOfDay 	= parseTimeOfDay(config.getString("Schedule.At", "7am"));
+		LocalTime timeOfDay = parseTimeOfDay(config.getString("Schedule.At", "7am"));
 		Duration repeatDuration = parseDuration(config.getString("Schedule.Repeat", "7d"));
 		Duration offsetDuration = parseDuration(config.getString("Schedule.Offset", "1d5h"));
-		Duration cooldown 		= parseDuration(config.getString("Schedule.Cooldown", "1d"));
-		double chance 			= config.getDouble("Schedule.TriggerChance", 0.5);
+		Duration cooldown = parseDuration(config.getString("Schedule.Cooldown", "1d"));
+		double chance = config.getDouble("Schedule.TriggerChance", 0.5);
 
 		return switch (scheduleType) {
 			case REAL_DAYS -> new EveryRealWorldDaysStrategy(

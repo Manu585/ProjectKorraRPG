@@ -1,7 +1,7 @@
 package com.projectkorra.rpg.modules.leveling.commands;
 
 import com.projectkorra.rpg.commands.RPGCommand;
-import com.projectkorra.rpg.modules.leveling.gui.master.MainGui;
+import com.projectkorra.rpg.modules.leveling.gui.GuiFactory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -9,8 +9,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class LevelCommand extends RPGCommand {
-	public LevelCommand() {
+	private final GuiFactory factory;
+
+	public LevelCommand(GuiFactory factory) {
 		super("level", "/bending level", "Opens the leveling menu", new String[]{"level", "l", "le"});
+
+		this.factory = factory;
 	}
 
 	@Override
@@ -21,7 +25,7 @@ public class LevelCommand extends RPGCommand {
 		}
 
 		if (args.isEmpty()) {
-			new MainGui(player).open(player);
+			factory.openMainMenu(player);
 		} else {
 			help(sender, true);
 		}
