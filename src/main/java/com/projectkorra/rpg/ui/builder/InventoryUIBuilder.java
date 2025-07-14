@@ -49,14 +49,14 @@ public class InventoryUIBuilder {
     }
 
     private void validateXY(int x, int y) {
-        if (x < 0 || x >= COLUMNS || y < 0 || y >= rows) {
-            throw new IllegalArgumentException("Slot out of bounds! x=" + x + " (0-" + (COLUMNS-1) + "), y=" + y + " (0-" + (rows-1) + ")");
+        if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) {
+            throw new IllegalArgumentException("Slot out of bounds! x=" + x + " (0-" + (getWidth()-1) + "), y=" + y + " (0-" + (getHeight()-1) + ")");
         }
     }
 
     public InventoryUIBuilder fill(ItemStack filler) {
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < COLUMNS; x++) {
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
                 withItem(x, y, filler);
             }
         }
