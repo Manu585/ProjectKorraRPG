@@ -31,11 +31,17 @@ public class ModuleManager {
 	}
 
 	public void enableModules() {
-		modules.stream().filter(Module::isEnabled).forEach(Module::enable);
+		for (Module module : modules) {
+			if (module.isEnabled()) {
+				module.enable();
+			}
+		}
 	}
 
 	public void disableModules() {
-		modules.stream().filter(Module::isEnabled).forEach(Module::disable);
+		for (Module module : modules) {
+			module.disable();
+		}
 	}
 
 	public List<Module> getModules() {
