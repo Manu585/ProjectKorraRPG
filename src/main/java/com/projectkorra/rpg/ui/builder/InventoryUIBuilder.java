@@ -63,6 +63,19 @@ public class InventoryUIBuilder {
         return this;
     }
 
+    public InventoryUIBuilder fillLeftRight(ItemStack border, ItemStack fill) {
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                if (x == 0 || x == 8) {
+                    withItem(x, y, border);
+                    continue;
+                }
+                withItem(x, y, fill);
+            }
+        }
+        return this;
+    }
+
     public InventoryUIBuilder fillBorder(ItemStack borderItem) {
         int w = getWidth();
         int h = getHeight();

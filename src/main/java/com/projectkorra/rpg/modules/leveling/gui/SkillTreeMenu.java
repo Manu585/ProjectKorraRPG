@@ -14,12 +14,10 @@ public class SkillTreeMenu implements Menu {
     @Override
     public InventoryUI buildUI(Player player) {
         return InventoryUIBuilder.create(ROWS, "&6Skill Tree")
-                .withButton(4, 1,
-                        ItemUtil.create(Material.DIAMOND, "&a&lCLICK ME"),
+                .withButton(4, 1, ItemUtil.create(Material.DIAMOND, "&a&lCLICK ME"),
                         e -> player.sendMessage(ChatUtil.color("&aHello from Skill Tree"))
                 )
-                .withButton(0, 2,
-                        ItemUtil.create(Material.ARROW, "&cBack"),
+                .withButton(0, 2, ItemUtil.create(Material.ARROW, "&cBack"),
                         e -> new MainMenu().open(player)
                 )
                 .build();
