@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class InventoryUIBuilder {
-    private static final int COLUMNS = Slot.COLUMNS;
+    private static final int MIN_ROWS = 1;
+    private static final int MAX_ROWS = 6;
+    private static final int COLUMNS = Slot.COLUMNS; // 9
+
     private final Map<Slot, ItemStack> items = new HashMap<>();
     private final Map<Slot, Consumer<InventoryClickEvent>> clickHandlers = new HashMap<>();
 
@@ -25,18 +28,20 @@ public class InventoryUIBuilder {
     }
 
     public static InventoryUIBuilder create(int rows, String title) {
-        if (rows < 1 || rows > 6) {
-            throw new IllegalArgumentException("rows must be between 1 and 6!");
+        if (rows < MIN_ROWS || rows > MAX_ROWS) {
+            throw new IllegalArgumentException("rows must be between " + MIN_ROWS + "-" + MAX_ROWS + "!");
         }
         return new InventoryUIBuilder(rows, ChatUtil.color(title));
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public InventoryUIBuilder withItem(int x, int y, ItemStack item) {
         validateXY(x, y);
         items.put(Slot.of(x, y), item);
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public InventoryUIBuilder withButton(int x, int y, ItemStack item, Consumer<InventoryClickEvent> onClick) {
         withItem(x, y, item);
         clickHandlers.put(Slot.of(x, y), onClick);
@@ -44,13 +49,35 @@ public class InventoryUIBuilder {
     }
 
     private void validateXY(int x, int y) {
-        if (x < 0 || x > 8 || y < 0 || y >= rows) {
-            throw new IllegalArgumentException("Slot out of bounds! x=" + x + " (0-8), y=" + y + " (0-" + (rows-1) + ")");
+        if (x < 0 || x >= COLUMNS || y < 0 || y >= rows) {
+            throw new IllegalArgumentException("Slot out of bounds! x=" + x + " (0-" + (COLUMNS-1) + "), y=" + y + " (0-" + (rows-1) + ")");
         }
     }
 
-    public InventoryUI build() {
-        return new BasicInventoryUI(rows, title, items, clickHandlers);
+    public InventoryUIBuilder fill(ItemStack filler) {
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < COLUMNS; x++) {
+                withItem(x, y, filler);
+            }
+        }
+        return this;
+    }
+
+    public InventoryUIBuilder fillBorder(ItemStack borderItem) {
+        int w = getWidth();
+        int h = getHeight();
+
+        for (int x = 0; x < w; x++) {
+            withItem(x, 0, borderItem);
+            withItem(x, h-1, borderItem);
+        }
+
+        for (int y = 1; y < h; y++) {
+            withItem(0, y, borderItem);
+            withItem(w - 1, y, borderItem);
+        }
+
+        return this;
     }
 
     public int getWidth() {
@@ -59,5 +86,9 @@ public class InventoryUIBuilder {
 
     public int getHeight() {
         return rows;
+    }
+
+    public InventoryUI build() {
+        return new BasicInventoryUI(rows, title, items, clickHandlers);
     }
 }
