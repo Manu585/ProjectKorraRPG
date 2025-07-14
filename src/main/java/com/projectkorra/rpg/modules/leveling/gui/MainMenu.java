@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.modules.leveling.gui;
 
-import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.ui.InventoryUI;
 import com.projectkorra.rpg.ui.builder.InventoryUIBuilder;
 import com.projectkorra.rpg.ui.menu.Menu;
@@ -16,7 +15,7 @@ public class MainMenu implements Menu {
     public InventoryUI buildUI(Player player) {
         Menu skillTree = new SkillTreeMenu();
 
-        InventoryUIBuilder mainMenuUI = InventoryUIBuilder.create(ROWS, ChatUtil.color("&1Main Menu"));
+        InventoryUIBuilder mainMenuUI = InventoryUIBuilder.create(ROWS, "&1Main Menu");
 
         ItemStack filler = ItemUtil.create(Material.GRAY_STAINED_GLASS_PANE, " ");
         ItemStack vines = ItemUtil.create(Material.TWISTING_VINES, " ");
@@ -30,7 +29,7 @@ public class MainMenu implements Menu {
             }
         }
 
-        mainMenuUI.withButton(3, 1, ItemUtil.create(Material.NETHER_STAR, ChatUtil.color("&1SkillTree")), click -> skillTree.open(player));
+        mainMenuUI.withButton(3, 1, ItemUtil.create(Material.NETHER_STAR, "&1SkillTree"), click -> skillTree.open(player));
 
         return mainMenuUI.build();
     }

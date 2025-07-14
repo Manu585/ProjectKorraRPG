@@ -13,7 +13,7 @@ public class SkillTreeMenu implements Menu {
 
     @Override
     public InventoryUI buildUI(Player player) {
-        return InventoryUIBuilder.create(ROWS, ChatUtil.color("&6Skill Tree"))
+        return InventoryUIBuilder.create(ROWS, "&6Skill Tree")
                 .withButton(4, 1,
                         ItemUtil.create(Material.DIAMOND, "&a&lCLICK ME"),
                         e -> player.sendMessage(ChatUtil.color("&aHello from Skill Tree"))

@@ -1,5 +1,6 @@
 package com.projectkorra.rpg.ui.builder;
 
+import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.ui.InventoryUI;
 import com.projectkorra.rpg.ui.Slot;
 import com.projectkorra.rpg.ui.impl.BasicInventoryUI;
@@ -27,7 +28,7 @@ public class InventoryUIBuilder {
         if (rows < 1 || rows > 6) {
             throw new IllegalArgumentException("rows must be between 1 and 6!");
         }
-        return new InventoryUIBuilder(rows, title);
+        return new InventoryUIBuilder(rows, ChatUtil.color(title));
     }
 
     public InventoryUIBuilder withItem(int x, int y, ItemStack item) {
