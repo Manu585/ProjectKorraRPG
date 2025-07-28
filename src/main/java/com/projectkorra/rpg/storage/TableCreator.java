@@ -8,7 +8,7 @@ public class TableCreator extends DBConnection {
     public static final String RPG_PLAYER_TABLE = "pkrpg_players";
     public static final String RPG_SCHEDULE_TABLE = "pkrpg_schedule";
     public static final String RPG_AVATAR_TABLE = "pkrpg_avatars";
-    public static final String RPG_PASTLIVES_TABLE = "pkrpg_pastlives";
+    public static final String RPG_PAST_LIVES_TABLE = "pkrpg_pastlives";
 
     public TableCreator() {
         this.createRpgPlayerTable();
@@ -111,10 +111,10 @@ public class TableCreator extends DBConnection {
 
     private void createRpgPastLivesTable() {
         if (sql instanceof MySQL) {
-            if (!sql.tableExists(RPG_PASTLIVES_TABLE)) {
-                ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_PASTLIVES_TABLE + " table");
+            if (!sql.tableExists(RPG_PAST_LIVES_TABLE)) {
+                ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_PAST_LIVES_TABLE + " table");
 
-                final String query = "CREATE TABLE `" + RPG_PASTLIVES_TABLE + "` ("
+                final String query = "CREATE TABLE `" + RPG_PAST_LIVES_TABLE + "` ("
                         + "`uuid` varchar(36) NOT NULL,"
                         + "`main_element` varchar(255) NOT NULL,"
                         + "`sub_elements` varchar(255) NOT NULL,"
@@ -127,10 +127,10 @@ public class TableCreator extends DBConnection {
                 sql.modifyQuery(query, false);
             }
         } else {
-            if (!sql.tableExists(RPG_PASTLIVES_TABLE)) {
-                ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_PASTLIVES_TABLE + " table");
+            if (!sql.tableExists(RPG_PAST_LIVES_TABLE)) {
+                ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_PAST_LIVES_TABLE + " table");
 
-                final String query = "CREATE TABLE " + RPG_PASTLIVES_TABLE + " ("
+                final String query = "CREATE TABLE " + RPG_PAST_LIVES_TABLE + " ("
                         + "uuid TEXT NOT NULL, "
                         + "main_element TEXT NOT NULL, "
                         + "sub_elements TEXT NOT NULL, "

@@ -279,7 +279,7 @@ public class AvatarManager {
     public boolean hasBeenAvatar(UUID uuid) {
         if (isCurrentRPGAvatar(uuid))
             return true;
-        ResultSet rs = DBConnection.sql.readQuery("SELECT uuid FROM " + TableCreator.RPG_PASTLIVES_TABLE + " WHERE uuid = '" + uuid.toString() + "'");
+        ResultSet rs = DBConnection.sql.readQuery("SELECT uuid FROM " + TableCreator.RPG_PAST_LIVES_TABLE + " WHERE uuid = '" + uuid.toString() + "'");
         boolean valid;
         try {
             valid = rs.next();
@@ -310,7 +310,7 @@ public class AvatarManager {
         }
         // Check if they have been avatar recently
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT endTime FROM " + TableCreator.RPG_PASTLIVES_TABLE + " WHERE uuid = '" + uuid + "' ORDER BY startTime DESC LIMIT 1");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT endTime FROM " + TableCreator.RPG_PAST_LIVES_TABLE + " WHERE uuid = '" + uuid + "' ORDER BY startTime DESC LIMIT 1");
             if (rs.next()) {
                 Timestamp endTime = rs.getTimestamp("endTime");
                 if (endTime != null && endTime.toInstant().plus(repeatSelectionCooldown).isAfter(Instant.now())) {
@@ -333,7 +333,7 @@ public class AvatarManager {
     private Set<UUID> fetchIneligiblePastAvatars() {
         Set<UUID> set = new HashSet<>();
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT uuid, MAX(endTime) AS lastEnd FROM " + TableCreator.RPG_PASTLIVES_TABLE + " GROUP BY uuid");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT uuid, MAX(endTime) AS lastEnd FROM " + TableCreator.RPG_PAST_LIVES_TABLE + " GROUP BY uuid");
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 Instant lastEnd = rs.getTimestamp("lastEnd").toInstant();
@@ -434,7 +434,7 @@ public class AvatarManager {
 
         // Record past life
         try {
-            DBConnection.sql.modifyQuery("INSERT INTO " + TableCreator.RPG_PASTLIVES_TABLE + " (uuid, startTime, player, endTime, elements, endReason) VALUES ('" + uuid + "', '" + Timestamp.from(start) + "', '" + offlinePlayer.getName() + "', '" + Timestamp.from(Instant.now()) + "', '" + String.join(",", originalElements.stream().map(Element::getName).toArray(String[]::new)) + "', '" + reason + "')", false);
+            DBConnection.sql.modifyQuery("INSERT INTO " + TableCreator.RPG_PAST_LIVES_TABLE + " (uuid, startTime, player, endTime, elements, endReason) VALUES ('" + uuid + "', '" + Timestamp.from(start) + "', '" + offlinePlayer.getName() + "', '" + Timestamp.from(Instant.now()) + "', '" + String.join(",", originalElements.stream().map(Element::getName).toArray(String[]::new)) + "', '" + reason + "')", false);
             DBConnection.sql.getConnection().setAutoCommit(true);
         } catch (SQLException ex) {
             plugin.getLogger().severe("Error recording past life: " + ex.getMessage());
@@ -463,7 +463,7 @@ public class AvatarManager {
 
         // Past lives
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_PASTLIVES_TABLE + " ORDER BY startTime DESC");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_PAST_LIVES_TABLE + " ORDER BY startTime DESC");
             while (rs.next()) {
                 String player = rs.getString("player");
                 String elems = rs.getString("elements");

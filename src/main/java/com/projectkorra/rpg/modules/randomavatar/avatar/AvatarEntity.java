@@ -12,14 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Avatar {
+/**
+ * The fields could be redundant since an AvatarEntity could actually just be a {@link BendingPlayer} with Start and end times and reason
+ * But as spoke about in the PR, this structure is very WIP and I would implement something like an AvatarRepository interface or similar, maybe.
+ */
+public class AvatarEntity {
     private final UUID uuid;
     private final Element mainElement;
     private final List<Element.SubElement> subElements;
 
     private Instant chosenTime;
+    private Instant endTime;
+    private EndReason endReason;
 
-    public Avatar(UUID uuid, Element mainElement, List<Element.SubElement> subElements) {
+    public AvatarEntity(UUID uuid, Element mainElement, List<Element.SubElement> subElements) {
         this.uuid = uuid;
         this.mainElement = mainElement;
         this.subElements = new ArrayList<>(); // Init empty List in case of no sub elements
@@ -29,10 +35,11 @@ public class Avatar {
         }
     }
 
-    public Avatar(UUID uuid, Element mainElement, List<Element.SubElement> subElements, Instant chosenTime, Instant endTime, EndReason reason) {
+    public AvatarEntity(UUID uuid, Element mainElement, List<Element.SubElement> subElements, Instant chosenTime, Instant endTime, EndReason reason) {
         this(uuid, mainElement, subElements);
         this.chosenTime = chosenTime;
-
+        this.endTime = endTime;
+        this.endReason = reason;
     }
 
     public void handleInitiation() {
@@ -93,7 +100,7 @@ public class Avatar {
 
     }
 
-    public Avatar getPreviousAvatar(UUID previousAvatarUUID) {
+    public AvatarEntity getPreviousAvatar(UUID previousAvatarUUID) {
         return AvatarManager.getPreviousAvatars().get(previousAvatarUUID) != null ? AvatarManager.getPreviousAvatars().get(previousAvatarUUID) : null;
     }
 
@@ -113,7 +120,23 @@ public class Avatar {
         return chosenTime;
     }
 
+    public Instant getEndTime() {
+        return endTime;
+    }
+
+    public EndReason getEndReason() {
+        return endReason;
+    }
+
     public void setChosenTime(Instant chosenTime) {
         this.chosenTime = chosenTime;
+    }
+
+    public void setEndTime(Instant endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setEndReason(EndReason endReason) {
+        this.endReason = endReason;
     }
 }

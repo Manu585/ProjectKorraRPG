@@ -22,15 +22,15 @@ public class AvatarManager {
     private static final FileConfiguration defaultConfig = ConfigManager.defaultConfig.get();
     private static final String CONFIG_PATH = "Modules.RandomAvatar.";
 
-    private static HashMap<UUID, Avatar> CURRENT_AVATARS;
-    private static HashMap<UUID, Avatar> PREVIOUS_AVATARS;
+    private static HashMap<UUID, AvatarEntity> CURRENT_AVATARS;
+    private static HashMap<UUID, AvatarEntity> PREVIOUS_AVATARS;
 
     public AvatarManager() {
         CURRENT_AVATARS = fillAvatarMap();
         PREVIOUS_AVATARS = fillPreviousAvatarMap();
     }
 
-    public static boolean isEligableToBecomeAvatar(Player player) {
+    public static boolean isEligibleToBecomeAvatar(Player player) {
         if (player == null) {
             return false;
         }
@@ -67,7 +67,7 @@ public class AvatarManager {
 
         DBConnection.sql.modifyQuery(query);
 
-        CURRENT_AVATARS.put(uuid, new Avatar(uuid, mainElement, subElements));
+        CURRENT_AVATARS.put(uuid, new AvatarEntity(uuid, mainElement, subElements));
     }
 
     /**
@@ -75,7 +75,7 @@ public class AvatarManager {
      */
     public static void checkAvatars() {
         List<Player> candidates = Bukkit.getOnlinePlayers().stream()
-                .filter(AvatarManager::isEligableToBecomeAvatar)
+                .filter(AvatarManager::isEligibleToBecomeAvatar)
                 .collect(Collectors.toList());
 
         if (candidates.isEmpty()) {
@@ -87,12 +87,12 @@ public class AvatarManager {
         BendingPlayer bendingPlayer = BendingPlayer.getBendingPlayer(player);
 
         if (bendingPlayer != null) {
-            new Avatar(player.getUniqueId(), bendingPlayer.getElements().getFirst(), bendingPlayer.getSubElements()).handleInitiation();
+            new AvatarEntity(player.getUniqueId(), bendingPlayer.getElements().getFirst(), bendingPlayer.getSubElements()).handleInitiation();
         }
     }
 
-    private HashMap<UUID, Avatar> fillAvatarMap() {
-        HashMap<UUID, Avatar> avatars = new HashMap<>();
+    private HashMap<UUID, AvatarEntity> fillAvatarMap() {
+        HashMap<UUID, AvatarEntity> avatars = new HashMap<>();
 
         try {
             ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_AVATAR_TABLE);
@@ -110,7 +110,7 @@ public class AvatarManager {
                     }
                 }
 
-                avatars.put(uuid, new Avatar(uuid, Element.fromString(mainElementName), subElements));
+                avatars.put(uuid, new AvatarEntity(uuid, Element.fromString(mainElementName), subElements));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -119,11 +119,11 @@ public class AvatarManager {
         return avatars;
     }
 
-    private HashMap<UUID, Avatar> fillPreviousAvatarMap() {
-        HashMap<UUID, Avatar> previousAvatars = new HashMap<>();
+    private HashMap<UUID, AvatarEntity> fillPreviousAvatarMap() {
+        HashMap<UUID, AvatarEntity> previousAvatars = new HashMap<>();
 
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_PASTLIVES_TABLE);
+            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_PAST_LIVES_TABLE);
 
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
@@ -140,7 +140,7 @@ public class AvatarManager {
                     }
                 }
 
-                previousAvatars.put(uuid, new Avatar(uuid, Element.fromString(mainElementName), subElements, chosenTime, endTime, endReason));
+                previousAvatars.put(uuid, new AvatarEntity(uuid, Element.fromString(mainElementName), subElements, chosenTime, endTime, endReason));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -149,11 +149,11 @@ public class AvatarManager {
         return previousAvatars;
     }
 
-    public static HashMap<UUID, Avatar> getCurrentAvatars() {
+    public static HashMap<UUID, AvatarEntity> getCurrentAvatars() {
         return CURRENT_AVATARS;
     }
 
-    public static HashMap<UUID, Avatar> getPreviousAvatars() {
+    public static HashMap<UUID, AvatarEntity> getPreviousAvatars() {
         return PREVIOUS_AVATARS;
     }
 }

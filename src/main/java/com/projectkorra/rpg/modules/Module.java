@@ -20,7 +20,7 @@ public abstract class Module {
     public abstract void disable();
 
     public void registerListeners(Listener... l) {
-        Arrays.stream(l).forEach(listener -> this.plugin.getServer().getPluginManager().registerEvents(listener, plugin));
+        Arrays.stream(l).forEach(listener -> this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin));
     }
 
     public ProjectKorraRPG getPlugin() {
