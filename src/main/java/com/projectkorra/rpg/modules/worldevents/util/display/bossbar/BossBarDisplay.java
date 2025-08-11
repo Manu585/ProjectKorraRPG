@@ -41,7 +41,6 @@ public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, Viewer
 	public void startDisplay(WorldEvent event) {
         KeyedBossBar existing = Bukkit.getBossBar(key);
         this.bossBar = (existing != null) ? existing : Bukkit.createBossBar(key, ChatUtil.color(title), barColor, barStyle);
-
         bossBar.setTitle(ChatUtil.color(title));
         bossBar.setColor(barColor);
         bossBar.setStyle(barStyle);
@@ -55,11 +54,10 @@ public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, Viewer
         }
 	}
 
-	@Override
-	public void updateDisplay(WorldEvent event, double progress) {
-        if (bossBar == null) return;
-        bossBar.setProgress(Math.max(0.0, Math.min(1.0, progress)));
-	}
+    @Override
+    public void updateTick(WorldEvent event, double progress) {
+        if (bossBar != null) bossBar.setProgress(progress);
+    }
 
 	@Override
 	public void stopDisplay(WorldEvent event) {

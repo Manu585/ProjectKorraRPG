@@ -25,9 +25,6 @@ public class ChatDisplay implements WorldEventDisplay {
 	}
 
 	@Override
-	public void updateDisplay(WorldEvent event, double progress) {}
-
-	@Override
 	public void stopDisplay(WorldEvent event) {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (event.getAffectedPlayers().contains(player.getUniqueId())) {

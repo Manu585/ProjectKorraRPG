@@ -110,13 +110,6 @@ public class WorldEvent implements org.bukkit.Keyed {
         affectedPlayers.clear();
 	}
 
-	// Updated WorldEvent display
-	public void updateDisplay(double progress) {
-		for (WorldEventDisplay display : displayMethods) {
-			display.updateDisplay(this, progress);
-		}
-	}
-
 	/**
 	 * Puts all WorldEvents from WorldEvents directory into the {@link WorldEvent#getAllEvents()} map
 	 */
@@ -180,6 +173,7 @@ public class WorldEvent implements org.bukkit.Keyed {
 		});
 	}
 
+    // TODO: Move to dedicated worldevent scheduler
 	private void startWorldEventTimer() {
 		final long duration = this.duration;
 		final long startTime = System.currentTimeMillis();
@@ -196,13 +190,18 @@ public class WorldEvent implements org.bukkit.Keyed {
 				double progress = 1.0 - (elapsed / (double) duration);
 
 				if (progress <= 0.0) {
-					updateDisplay(0.0);
+                    for (WorldEventDisplay d : displayMethods) {
+                        if (d instanceof TickingDisplay t) t.updateTick(WorldEvent.this, 0.0);
+                    }
 					stopEvent();
 					cancel();
 					return;
 				}
 
-				updateDisplay(Math.max(0.0, Math.min(1.0, progress)));
+                double clamped = Math.max(0.0, Math.min(1.0, progress));
+                for (WorldEventDisplay d : displayMethods) {
+                    if (d instanceof TickingDisplay t) t.updateTick(WorldEvent.this, clamped);
+                }
 			}
 		}.runTaskTimer(ProjectKorraRPG.getPlugin(), 0L, period);
 	}
