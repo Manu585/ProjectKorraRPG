@@ -4,8 +4,9 @@ import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStartEvent;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
 import com.projectkorra.rpg.modules.worldevents.util.DisplayHelper;
-import com.projectkorra.rpg.modules.worldevents.util.display.ITickingDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.TickingDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.ViewerDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.BossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.chat.ChatDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.scoreboard.ScoreboardDisplay;
@@ -35,14 +36,14 @@ public class WorldEvent implements org.bukkit.Keyed {
 	private long duration;
 	private World world;
 
-	private List<IWorldEventDisplay> displayMethods;
+	private List<WorldEventDisplay> displayMethods;
 	private List<World> disabledWorlds;
 
 	private final FileConfiguration config;
 
     private @Nullable BukkitTask timerTask;
 
-	public WorldEvent(NamespacedKey key, String title, long duration, List<World> disabledWorlds, FileConfiguration config, World world, List<IWorldEventDisplay> displayMethods) {
+	public WorldEvent(NamespacedKey key, String title, long duration, List<World> disabledWorlds, FileConfiguration config, World world, List<WorldEventDisplay> displayMethods) {
 		this.key = key;
 		this.title = title;
 		this.duration = duration;
@@ -76,7 +77,7 @@ public class WorldEvent implements org.bukkit.Keyed {
 		}
 
 		// Start the display for the event
-		for (IWorldEventDisplay display : displayMethods) display.startDisplay(this);
+		for (WorldEventDisplay display : displayMethods) display.startDisplay(this);
 		startWorldEventTimer();
 	}
 
@@ -105,13 +106,13 @@ public class WorldEvent implements org.bukkit.Keyed {
 		}
 
 		// Stop the display for the event
-		for (IWorldEventDisplay display : displayMethods) display.stopDisplay(this);
+		for (WorldEventDisplay display : displayMethods) display.stopDisplay(this);
         affectedPlayers.clear();
 	}
 
 	// Updated WorldEvent display
 	public void updateDisplay(double progress) {
-		for (IWorldEventDisplay display : displayMethods) {
+		for (WorldEventDisplay display : displayMethods) {
 			display.updateDisplay(this, progress);
 		}
 	}
@@ -143,7 +144,7 @@ public class WorldEvent implements org.bukkit.Keyed {
 			String configWorldName = config.getString("World", null);
 			World world = (configWorldName == null) ? null : Bukkit.getWorld(configWorldName);
 
-			List<IWorldEventDisplay> displayMethods = new ArrayList<>();
+			List<WorldEventDisplay> displayMethods = new ArrayList<>();
 
 			// BossBar-Display
 			if (config.getBoolean("DisplayMethods.BossBar.Enabled", false)) {
@@ -184,8 +185,8 @@ public class WorldEvent implements org.bukkit.Keyed {
 		final long startTime = System.currentTimeMillis();
 
         long period = 20L;
-        for (IWorldEventDisplay display : displayMethods) {
-            if (display instanceof ITickingDisplay tickingDisplay) period = Math.min(period, Math.max(1L, tickingDisplay.tickPeriod()));
+        for (WorldEventDisplay display : displayMethods) {
+            if (display instanceof TickingDisplay tickingDisplay) period = Math.min(period, Math.max(1L, tickingDisplay.tickPeriod()));
         }
 
 		this.timerTask = new BukkitRunnable() {
@@ -205,6 +206,34 @@ public class WorldEvent implements org.bukkit.Keyed {
 			}
 		}.runTaskTimer(ProjectKorraRPG.getPlugin(), 0L, period);
 	}
+
+    public boolean addAffected(UUID uuid) {
+        return affectedPlayers.add(uuid);
+    }
+
+    public boolean removeAffected(UUID uuid) {
+        return affectedPlayers.remove(uuid);
+    }
+
+    /**
+     * Notify displays that a single viewer was added
+     * @param player Viewer
+     */
+    public void notifyViewerAdded(Player player) {
+        for (WorldEventDisplay display : displayMethods) {
+            if (display instanceof ViewerDisplay viewerDisplay) viewerDisplay.addViewer(player);
+        }
+    }
+
+    /**
+     * Notify displays that a single viewer was removed
+     * @param player Viewer
+     */
+    public void notifyViewerRemoved(Player player) {
+        for (WorldEventDisplay display : displayMethods) {
+            if (display instanceof  ViewerDisplay viewerDisplay) viewerDisplay.removeViewer(player);
+        }
+    }
 
     private static Sound resolveSound(String raw, Sound fallback) {
         if (raw == null || raw.isBlank()) return fallback;
@@ -260,7 +289,7 @@ public class WorldEvent implements org.bukkit.Keyed {
 		return world;
 	}
 
-	public List<IWorldEventDisplay> getDisplayMethods() {
+	public List<WorldEventDisplay> getDisplayMethods() {
 		return displayMethods;
 	}
 
@@ -284,7 +313,7 @@ public class WorldEvent implements org.bukkit.Keyed {
 		this.world = world;
 	}
 
-	public void setDisplayMethods(List<IWorldEventDisplay> displayMethods) {
+	public void setDisplayMethods(List<WorldEventDisplay> displayMethods) {
 		this.displayMethods = displayMethods;
 	}
 

@@ -2,7 +2,9 @@ package com.projectkorra.rpg.modules.worldevents.util.display.bossbar;
 
 import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.util.display.ITickingDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.TickingDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.ViewerDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
@@ -12,7 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class BossBarDisplay implements ITickingDisplay {
+public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, ViewerDisplay {
     private final NamespacedKey key;
     private final String title;
     private final BarColor barColor;
@@ -34,11 +36,6 @@ public class BossBarDisplay implements ITickingDisplay {
         this.barStyle = barStyle;
         this.smooth = smooth;
 	}
-
-    @Override
-    public long tickPeriod() {
-        return smooth ? 1L : 20L;
-    }
 
 	@Override
 	public void startDisplay(WorldEvent event) {
@@ -78,4 +75,19 @@ public class BossBarDisplay implements ITickingDisplay {
         Bukkit.removeBossBar(key);
         bossBar = null;
 	}
+
+    @Override
+    public long tickPeriod() {
+        return smooth ? 1L : 20L;
+    }
+
+    @Override
+    public void addViewer(Player viewer) {
+        if (bossBar != null) bossBar.addPlayer(viewer);
+    }
+
+    @Override
+    public void removeViewer(Player viewer) {
+        if (bossBar != null) bossBar.removePlayer(viewer);
+    }
 }

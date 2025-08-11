@@ -1,12 +1,12 @@
 package com.projectkorra.rpg.modules.worldevents.util.display.chat;
 
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
 import com.projectkorra.rpg.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class ChatDisplay implements IWorldEventDisplay {
+public class ChatDisplay implements WorldEventDisplay {
 	private final String startMessage;
 	private final String stopMessage;
 

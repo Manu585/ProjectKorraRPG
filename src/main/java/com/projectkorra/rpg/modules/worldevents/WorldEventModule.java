@@ -3,6 +3,7 @@ package com.projectkorra.rpg.modules.worldevents;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
+import com.projectkorra.rpg.modules.worldevents.listeners.HandleWorldEventDisplayListener;
 import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventModificationListener;
 import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventScheduleListener;
 import com.projectkorra.rpg.modules.worldevents.methods.WorldEventModificationService;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 public class WorldEventModule extends Module {
 	private WorldEventModificationListener modificationListener;
 	private WorldEventModificationService modificationService;
+    private HandleWorldEventDisplayListener handleWorldEventDisplayListener;
 
 	private WorldEventScheduleListener scheduleListener;
 	private WorldEventScheduler worldEventScheduler;
@@ -43,13 +45,15 @@ public class WorldEventModule extends Module {
 		// Create and Register Modification Listener
 		this.modificationListener = new WorldEventModificationListener(this.modificationService);
 		this.scheduleListener = new WorldEventScheduleListener(this.worldEventScheduler);
+        this.handleWorldEventDisplayListener = new HandleWorldEventDisplayListener(this.getPlugin());
 
 		// Register Commands
 		new WorldEventCommand();
 
 		registerListeners(
 				this.modificationListener,
-				this.scheduleListener
+				this.scheduleListener,
+                this.handleWorldEventDisplayListener
 		);
 
 		this.getPlugin().getLogger().info("WorldEvent module enabled successfully!");
@@ -92,7 +96,15 @@ public class WorldEventModule extends Module {
 		return modificationService;
 	}
 
-	public WorldEventScheduler getWorldEventScheduler() {
+    public HandleWorldEventDisplayListener getPlayerSwitchWorldListener() {
+        return handleWorldEventDisplayListener;
+    }
+
+    public WorldEventScheduleListener getScheduleListener() {
+        return scheduleListener;
+    }
+
+    public WorldEventScheduler getWorldEventScheduler() {
 		return this.worldEventScheduler;
 	}
 

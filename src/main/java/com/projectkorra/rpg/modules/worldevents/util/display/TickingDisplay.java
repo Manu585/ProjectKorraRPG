@@ -1,5 +1,5 @@
 package com.projectkorra.rpg.modules.worldevents.util.display;
 
-public interface ITickingDisplay extends IWorldEventDisplay {
+public interface TickingDisplay {
     long tickPeriod();
 }
