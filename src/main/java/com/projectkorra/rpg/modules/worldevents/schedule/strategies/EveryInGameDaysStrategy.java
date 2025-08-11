@@ -19,7 +19,7 @@ public class EveryInGameDaysStrategy implements WorldEventScheduleStrategy {
 	private final ScheduleStorage storage;
 
 	private BukkitTask task;
-	private Instant lastTriggerTime = null;
+	private final Instant lastTriggerTime = null;
 
 	public EveryInGameDaysStrategy(LocalTime timeOfDay, Duration repeatDuration, Duration offsetDuration, double chance, Duration cooldownDuration, ScheduleStorage storage) {
 		this.timeOfDay = timeOfDay;

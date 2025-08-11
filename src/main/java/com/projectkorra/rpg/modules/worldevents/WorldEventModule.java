@@ -29,7 +29,7 @@ public class WorldEventModule extends Module {
 		this.getPlugin().getLogger().info("Enabling WorldEvent module...");
 
 		// Initialize all valid WorldEvents found in each config file in the WorldEvents directory
-		WorldEvent.initAllWorldEvents();
+		WorldEvent.initAllWorldEvents(this.getPlugin());
 
 		// Create ModificationService for Listener
 		this.modificationService = new WorldEventModificationService();
@@ -79,9 +79,7 @@ public class WorldEventModule extends Module {
 		}
 
 		// Clear Worldevent maps
-		WorldEvent.getActiveEvents().clear();
-		WorldEvent.getAllEvents().clear();
-		WorldEvent.getAffectedPlayers().clear();
+        WorldEvent.clearRegistries();
 
 		this.getPlugin().getLogger().info("WorldEvent module disabled successfully!");
 	}

@@ -45,7 +45,7 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
     public void scheduleNext(WorldEvent event, Plugin plugin) {
         cancelSchedule();
 
-        String eventKey = event.getKey();
+        String eventKey = event.id();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime nextTime;
 
@@ -94,7 +94,7 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
     }
 
     private void tryTriggerEvent(WorldEvent event, Plugin plugin) {
-        String eventKey = event.getKey();
+        String eventKey = event.id();
         boolean onCooldown = false;
 
         try {

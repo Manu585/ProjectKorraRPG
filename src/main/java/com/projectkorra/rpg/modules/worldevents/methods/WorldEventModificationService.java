@@ -38,7 +38,7 @@ public class WorldEventModificationService {
 		Object rawValue = findConfigurationValue(worldEvent.getConfig(), context);
 		if (rawValue == null) return;
 
-		AttributeModification mod = buildModification(rawValue, worldEvent.getWorldEventNamespacedKey());
+		AttributeModification mod = buildModification(rawValue, worldEvent.getKey());
 		if (mod != null) {
 			event.addModification(mod);
 		}
