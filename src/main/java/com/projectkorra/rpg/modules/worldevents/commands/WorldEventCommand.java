@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class WorldEventCommand extends RPGCommand {
     private final WorldEventManager manager;
@@ -97,37 +96,26 @@ public class WorldEventCommand extends RPGCommand {
             return List.of("start", "stop");
         }
 
-        final String first = args.getFirst().toLowerCase(Locale.ROOT);
-
         if (args.size() == 1) {
-            return Stream.of("start", "stop")
-                    .filter(s -> s.startsWith(first))
-                    .sorted()
-                    .toList();
-        }
-
-        if (args.size() == 2) {
-            final String partial = args.get(1).toLowerCase(Locale.ROOT);
-
-            if ("start".equals(first)) {
+            if ("start".equals(args.getFirst().toLowerCase(Locale.ROOT))) {
                 // Inactive events only
                 final Set<WorldEvent> active = manager.getActiveEvents();
                 return manager.getLoadedWorldEvents().entrySet().stream()
                         .filter(e -> !active.contains(e.getValue()))
                         .map(e -> e.getKey().getKey())
-                        .filter(id -> id.startsWith(partial))
                         .sorted(String.CASE_INSENSITIVE_ORDER)
                         .collect(Collectors.toList());
             }
 
-            if ("stop".equals(first)) {
+            if ("stop".equals(args.getFirst().toLowerCase(Locale.ROOT))) {
                 // Active events only
                 return manager.getActiveEvents().stream()
                         .map(WorldEvent::getKey)
                         .map(NamespacedKey::getKey)
-                        .filter(id -> id.startsWith(partial))
                         .sorted(String.CASE_INSENSITIVE_ORDER)
                         .collect(Collectors.toList());
+            } else {
+                return List.of("Penis");
             }
         }
 
