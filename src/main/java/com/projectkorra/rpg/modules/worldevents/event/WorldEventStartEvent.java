@@ -1,6 +1,6 @@
 package com.projectkorra.rpg.modules.worldevents.event;
 
-import com.projectkorra.rpg.modules.worldevents.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;

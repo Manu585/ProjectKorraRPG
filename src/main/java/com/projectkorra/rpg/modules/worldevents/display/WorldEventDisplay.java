@@ -1,6 +1,6 @@
-package com.projectkorra.rpg.modules.worldevents.util.display;
+package com.projectkorra.rpg.modules.worldevents.display;
 
-import com.projectkorra.rpg.modules.worldevents.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
 
 /**
  * Handles Lifecycle of messages / displays for {@link WorldEvent}

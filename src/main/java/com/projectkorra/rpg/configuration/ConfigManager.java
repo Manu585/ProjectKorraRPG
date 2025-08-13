@@ -3,9 +3,6 @@ package com.projectkorra.rpg.configuration;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.configuration.ConfigType;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -252,7 +249,7 @@ public class ConfigManager {
             config.addDefault("Schedule.Repeat", "7d");
             config.addDefault("Schedule.Calendar", "REALTIME");
             config.addDefault("Schedule.Offset", "3d12h");
-            config.addDefault("Schedule.TriggerChance", "0.1");
+            config.addDefault("Schedule.TriggerChance", 0.1);
             config.addDefault("Schedule.Cooldown", "60d");
 
             config.addDefault("DisplayMethods.BossBar.Enabled", true);
@@ -262,7 +259,7 @@ public class ConfigManager {
             config.addDefault("DisplayMethods.Chat.Enabled", true);
             config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Firebenders bending has been extremely hightened");
             config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozins Comet has left the world's atmosphere. Firebenders bending has been normalized");
-            config.addDefault("DisplayMethods.ScoreBoard.Enabled", false);
+            config.addDefault("DisplayMethods.Scoreboard.Enabled", false);
             config.addDefault("PlayEventStartSound", true);
             config.addDefault("EventStart.Sound", "entity.ender_dragon.growl");
             config.addDefault("EventStart.Volume", "1");

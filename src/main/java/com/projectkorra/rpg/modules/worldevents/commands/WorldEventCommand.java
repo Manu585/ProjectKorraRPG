@@ -1,26 +1,31 @@
 package com.projectkorra.rpg.modules.worldevents.commands;
 
 import com.projectkorra.rpg.commands.RPGCommand;
-import com.projectkorra.rpg.modules.worldevents.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.manager.WorldEventManager;
+import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WorldEventCommand extends RPGCommand {
-	public WorldEventCommand() {
+    private final WorldEventManager manager;
+
+	public WorldEventCommand(final WorldEventManager manager) {
 		super("event", "/bending rpg event start <id> | /bending rpg event stop <id>", "Manage worldevents", new String[]{"event", "e", "ev"});
-	}
+	    this.manager = manager;
+    }
 
 	@Override
 	public void execute(CommandSender sender, List<String> args) {
-        if (args.isEmpty() || args.size() < 2) {
+        if (args.isEmpty()) {
             help(sender, true);
             return;
         }
 
-        String sub = args.getFirst().toLowerCase(Locale.ROOT);
+        final String sub = args.getFirst().toLowerCase(Locale.ROOT);
 
         switch (sub) {
             case "start" -> {
@@ -29,49 +34,62 @@ public class WorldEventCommand extends RPGCommand {
                     return;
                 }
 
-                String idPath = args.get(1);
-                WorldEvent we = WorldEvent.getByPath(idPath).orElse(null);
-                if (we == null) {
+                final String idPath = args.get(1);
+                final WorldEvent worldEvent = findByPath(idPath).orElse(null);
+                if (worldEvent == null) {
                     sender.sendMessage("WorldEvent " + idPath + " not found!");
                     return;
                 }
-                if (WorldEvent.getActiveEvents().contains(we)) {
+                if (manager.getActiveEvents().contains(worldEvent)) {
                     sender.sendMessage("Worldevent " + idPath + " is already active!");
                     return;
                 }
-                we.startEvent();
+
+                // START EVENT
+                if (manager.start(worldEvent)) {
+                    sender.sendMessage("Started WorldEvent '" + worldEvent.getKey().getKey() + "'");
+                } else {
+                    sender.sendMessage("Could not start WorldEvent '" + idPath + "'. Check logs for more details.");
+                }
             }
 
             case "stop" -> {
+                // STOP ALL
                 if (args.size() == 1) {
-                    ArrayList<WorldEvent> snapshot = new ArrayList<>(WorldEvent.getActiveEvents());
-                    if (snapshot.isEmpty()) {
-                        sender.sendMessage("No active WorldEvents to stop");
+                    if (manager.getActiveEvents().isEmpty()) {
+                        sender.sendMessage("No active WorldEvents to stop.");
                         return;
                     }
-
-                    snapshot.forEach(WorldEvent::stopEvent);
+                    manager.stopAll();
+                    sender.sendMessage("Stopped all active WorldEvents.");
                     return;
                 }
 
+                // STOP SPECIFIC
                 if (args.size() == 2) {
-                    String idPath = args.get(1);
-                    WorldEvent we = WorldEvent.getByPath(idPath).orElse(null);
+                    final String idPath = args.get(1);
+                    final WorldEvent we = findByPath(idPath).orElse(null);
                     if (we == null) {
-                        sender.sendMessage("WorldEvent " + idPath + " not found!");
+                        sender.sendMessage("WorldEvent '" + idPath + "' not found.");
                         return;
                     }
-                    if (!WorldEvent.getActiveEvents().contains(we)) {
-                        sender.sendMessage("WorldEvent " + idPath + " is not active!");
+                    if (!manager.getActiveEvents().contains(we)) {
+                        sender.sendMessage("WorldEvent '" + idPath + "' is not active.");
                         return;
                     }
-                    we.stopEvent();
+                    if (manager.stop(we)) {
+                        sender.sendMessage("Stopped world event '" + we.getKey().getKey() + "'.");
+                    } else {
+                        sender.sendMessage("Could not stop world event '" + idPath + "'. Check logs for details.");
+                    }
+                } else {
+                    help(sender, false);
                 }
             }
 
             default -> help(sender, true);
         }
-	}
+    }
 
     @Override
     protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
@@ -79,30 +97,49 @@ public class WorldEventCommand extends RPGCommand {
             return List.of("start", "stop");
         }
 
-        String first = args.getFirst().toLowerCase(Locale.ROOT);
-
-        Set<WorldEvent> activeSet = new HashSet<>(WorldEvent.getActiveEvents());
-
-        List<String> activeIds = WorldEvent.getActiveEvents().stream()
-                .map(WorldEvent::getKey).map(NamespacedKey::getKey)
-                .sorted(String.CASE_INSENSITIVE_ORDER)
-                .toList();
-
-        List<String> inactiveIds = WorldEvent.getAllEvents().entrySet().stream()
-                .filter(e -> !activeSet.contains(e.getValue()))
-                .map(e -> e.getKey().getKey())
-                .sorted(String.CASE_INSENSITIVE_ORDER)
-                .toList();
+        final String first = args.getFirst().toLowerCase(Locale.ROOT);
 
         if (args.size() == 1) {
-            if ("start".equals(first)) return inactiveIds;
-            if ("stop".equals(first)) return activeIds;
-
             return Stream.of("start", "stop")
                     .filter(s -> s.startsWith(first))
+                    .sorted()
                     .toList();
         }
 
+        if (args.size() == 2) {
+            final String partial = args.get(1).toLowerCase(Locale.ROOT);
+
+            if ("start".equals(first)) {
+                // Inactive events only
+                final Set<WorldEvent> active = manager.getActiveEvents();
+                return manager.getLoadedWorldEvents().entrySet().stream()
+                        .filter(e -> !active.contains(e.getValue()))
+                        .map(e -> e.getKey().getKey())
+                        .filter(id -> id.startsWith(partial))
+                        .sorted(String.CASE_INSENSITIVE_ORDER)
+                        .collect(Collectors.toList());
+            }
+
+            if ("stop".equals(first)) {
+                // Active events only
+                return manager.getActiveEvents().stream()
+                        .map(WorldEvent::getKey)
+                        .map(NamespacedKey::getKey)
+                        .filter(id -> id.startsWith(partial))
+                        .sorted(String.CASE_INSENSITIVE_ORDER)
+                        .collect(Collectors.toList());
+            }
+        }
+
         return Collections.emptyList();
+    }
+
+    private Optional<WorldEvent> findByPath(String path) {
+        if (path == null) return Optional.empty();
+        final String target = path.toLowerCase(Locale.ROOT);
+        return manager.getLoadedWorldEvents().entrySet().stream()
+                .filter(e -> e.getKey().getKey().equalsIgnoreCase(target))
+                .map(Map.Entry::getValue)
+                .findFirst();
     }
 }

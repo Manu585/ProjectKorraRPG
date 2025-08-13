@@ -1,14 +1,17 @@
 package com.projectkorra.rpg.modules.worldevents.methods;
 
+import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.attribute.AttributeModification;
 import com.projectkorra.projectkorra.attribute.AttributeModifier;
 import com.projectkorra.projectkorra.attribute.AttributeUtil;
 import com.projectkorra.projectkorra.event.AbilityRecalculateAttributeEvent;
 import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.modules.worldevents.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.manager.WorldEventManager;
+import com.projectkorra.rpg.modules.worldevents.models.AttributeRules;
+import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
 import commonslang3.projectkorra.lang3.tuple.Pair;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 /**
  * A service class responsible for applying world-event-based attribute modifications to abilities.
@@ -17,69 +20,54 @@ import org.bukkit.configuration.file.FileConfiguration;
  * Has to listen to the {@link AbilityRecalculateAttributeEvent} to function.
  */
 public class WorldEventModificationService {
-	private static final String GLOBAL_PATH_FORMAT = "Abilities._All.%s";
-	private static final String ELEMENTS_PATH_FORMAT = "Abilities.%s._All.%s";
-	private static final String ABILITIES_PATH_FORMAT = "Abilities.%s.%s.%s";
+    private final WorldEventManager manager;
+
+    public WorldEventModificationService(WorldEventManager manager) {
+        this.manager = manager;
+    }
 
 	/**
-	 * Applies modifications from active worldevents to the abilities configured in the coresponding config
+	 * Applies modifications from active WorldEvents to the abilities configured in the corresponding config
 	 */
 	public void applyWorldEventMods(AbilityRecalculateAttributeEvent event) {
-		AttributeContext context = new AttributeContext(
-				event.getAbility().getElement().getName(),
-				event.getAbility().getName(),
-				event.getAttribute()
-		);
+        final BendingPlayer bendingPlayer = event.getAbility().getBendingPlayer();
+        if (bendingPlayer == null) return;
+        final Player player = bendingPlayer.getPlayer();
+        if (player == null || !player.isOnline()) return;
 
-		WorldEvent.getActiveEvents().forEach(worldEvent -> processWorldEvent(event, worldEvent, context));
+        final String element = event.getAbility().getElement().getName();
+        final String ability = event.getAbility().getName();
+        final String attribute = event.getAttribute();
+
+        for (WorldEvent worldEvent : manager.getActiveEventsInWorld(player.getWorld())) {
+            AttributeRules rules = worldEvent.getAttributeRules();
+            if (rules == null) continue;
+
+            Object raw = rules.find(element, ability, attribute);
+            if (raw == null) continue;
+
+            AttributeModification mod = buildModification(raw, worldEvent.getKey());
+            if (mod != null) event.addModification(mod);
+        }
 	}
 
-	private void processWorldEvent(AbilityRecalculateAttributeEvent event, WorldEvent worldEvent, AttributeContext context) {
-		Object rawValue = findConfigurationValue(worldEvent.getConfig(), context);
-		if (rawValue == null) return;
-
-		AttributeModification mod = buildModification(rawValue, worldEvent.getKey());
-		if (mod != null) {
-			event.addModification(mod);
-		}
-	}
-
-	private Object findConfigurationValue(FileConfiguration config, AttributeContext context) {
-		// Specific ability path
-		String abilitySpecificPath = String.format(ABILITIES_PATH_FORMAT, context.element(), context.abilityName(), context.attributeName());
-		Object value = config.get(abilitySpecificPath);
-		if (value != null) return value;
-
-		// Element path
-		String elementPath = String.format(ELEMENTS_PATH_FORMAT, context.element(), context.attributeName());
-		value = config.get(elementPath);
-		if (value != null) return value;
-
-		// Global path
-		String globalPath = String.format(GLOBAL_PATH_FORMAT, context.attributeName());
-		value = config.get(globalPath);
-		return value;
-	}
-
-	private AttributeModification buildModification(Object raw, NamespacedKey nsKey) {
-		if (raw instanceof Boolean) {
-			return AttributeModification.setter((Boolean) raw, AttributeModification.PRIORITY_NORMAL, nsKey);
+	private AttributeModification buildModification(Object raw, NamespacedKey key) {
+		if (raw instanceof Boolean b) {
+			return AttributeModification.setter(b, AttributeModification.PRIORITY_NORMAL, key);
 		}
 
-		if (raw instanceof Number) {
-			return AttributeModification.of(AttributeModifier.SET, (Number) raw, AttributeModification.PRIORITY_NORMAL, nsKey);
+		if (raw instanceof Number n) {
+			return AttributeModification.of(AttributeModifier.SET, n, AttributeModification.PRIORITY_NORMAL, key);
 		}
 
 		String rawStr = raw.toString().replace(" ", "");
 		Pair<AttributeModifier, Number> parsed = AttributeUtil.getModification(rawStr);
 
 		if (parsed != null) {
-			return AttributeModification.of(parsed.getLeft(), parsed.getRight(), AttributeModification.PRIORITY_NORMAL, nsKey);
+			return AttributeModification.of(parsed.getLeft(), parsed.getRight(), AttributeModification.PRIORITY_NORMAL, key);
 		}
 
-		ProjectKorraRPG.getPlugin().getLogger().warning("WorldEvent parse failed for key=" + nsKey.getKey() + " raw=" + rawStr);
+		ProjectKorraRPG.getPlugin().getLogger().warning("WorldEvent parse failed for key:" + key.getKey() + " raw:" + rawStr);
 		return null;
 	}
-
-	record AttributeContext(String element, String abilityName, String attributeName) {}
 }

@@ -1,18 +1,16 @@
-package com.projectkorra.rpg.modules.worldevents.util.display.bossbar;
+package com.projectkorra.rpg.modules.worldevents.display.bossbar;
 
 import com.projectkorra.projectkorra.util.ChatUtil;
-import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.util.display.TickingDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.ViewerDisplay;
+import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.display.TickingDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.ViewerDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, ViewerDisplay {
     private final NamespacedKey key;
@@ -24,7 +22,6 @@ public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, Viewer
     private KeyedBossBar bossBar;
 
 	/**
-	 *
 	 * @param barColor Color of BossBar
 	 * @param barStyle Style of BossBar
 	 * @param smooth   <code>true</code> Refresh every tick <code>else</code> every second
@@ -41,35 +38,27 @@ public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, Viewer
 	public void startDisplay(WorldEvent event) {
         KeyedBossBar existing = Bukkit.getBossBar(key);
         this.bossBar = (existing != null) ? existing : Bukkit.createBossBar(key, ChatUtil.color(title), barColor, barStyle);
+
         bossBar.setTitle(ChatUtil.color(title));
         bossBar.setColor(barColor);
         bossBar.setStyle(barStyle);
         bossBar.setProgress(1.0);
+        bossBar.setVisible(true);
 
-        for (UUID uuid : event.getAffectedPlayers()) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null && player.isOnline()) {
-                bossBar.addPlayer(player);
-            }
-        }
+        bossBar.removeAll(); // WorldEventManager handles viewers
 	}
 
     @Override
     public void updateTick(WorldEvent event, double progress) {
-        if (bossBar != null) bossBar.setProgress(progress);
+        if (bossBar == null) return;
+        bossBar.setProgress(progress);
     }
 
 	@Override
 	public void stopDisplay(WorldEvent event) {
         if (bossBar == null) return;
 
-        for (UUID uuid : event.getAffectedPlayers()) {
-            Player player = Bukkit.getPlayer(uuid);
-                if (player != null && player.isOnline()) {
-                    bossBar.removePlayer(player);
-                }
-            }
-
+        bossBar.removeAll();
         Bukkit.removeBossBar(key);
         bossBar = null;
 	}

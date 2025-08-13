@@ -1,7 +1,8 @@
-package com.projectkorra.rpg.modules.worldevents.listeners;
+package com.projectkorra.rpg.modules.worldevents.listener;
 
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.event.AbilityRecalculateAttributeEvent;
+import com.projectkorra.rpg.modules.worldevents.event.WorldEventStartEvent;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
 import com.projectkorra.rpg.modules.worldevents.methods.WorldEventModificationService;
 import org.bukkit.event.EventHandler;
@@ -17,8 +18,15 @@ public class WorldEventModificationListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void onAttributeRecalc(final AbilityRecalculateAttributeEvent event) {
-		this.modificationService.applyWorldEventMods(event);
+        this.modificationService.applyWorldEventMods(event);
 	}
+
+    @EventHandler
+    public void onWorldEventStart(final WorldEventStartEvent event) {
+        for (CoreAbility ability : CoreAbility.getAbilitiesByInstances()) {
+            ability.recalculateAttributes();
+        }
+    }
 
 	@EventHandler
 	public void onWorldEventStop(final WorldEventStopEvent event) {
