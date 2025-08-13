@@ -97,21 +97,26 @@ public class WorldEventCommand extends RPGCommand {
         }
 
         if (args.size() == 1) {
-            if ("start".equals(args.getFirst().toLowerCase(Locale.ROOT))) {
+            final String first = args.getFirst().toLowerCase(Locale.ROOT);
+            final String partialId = (args.size() > 1 ? args.get(1) : "").toLowerCase(Locale.ROOT);
+
+            if ("start".equals(first)) {
                 // Inactive events only
                 final Set<WorldEvent> active = manager.getActiveEvents();
                 return manager.getLoadedWorldEvents().entrySet().stream()
                         .filter(e -> !active.contains(e.getValue()))
                         .map(e -> e.getKey().getKey())
+                        .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
                         .sorted(String.CASE_INSENSITIVE_ORDER)
                         .collect(Collectors.toList());
             }
 
-            if ("stop".equals(args.getFirst().toLowerCase(Locale.ROOT))) {
+            if ("stop".equals(first)) {
                 // Active events only
                 return manager.getActiveEvents().stream()
                         .map(WorldEvent::getKey)
                         .map(NamespacedKey::getKey)
+                        .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
                         .sorted(String.CASE_INSENSITIVE_ORDER)
                         .collect(Collectors.toList());
             }
@@ -119,6 +124,7 @@ public class WorldEventCommand extends RPGCommand {
 
         return Collections.emptyList();
     }
+
 
     private Optional<WorldEvent> findByPath(String path) {
         if (path == null) return Optional.empty();
