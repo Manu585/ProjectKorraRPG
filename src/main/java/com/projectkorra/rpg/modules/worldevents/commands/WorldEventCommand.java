@@ -114,8 +114,6 @@ public class WorldEventCommand extends RPGCommand {
                         .map(NamespacedKey::getKey)
                         .sorted(String.CASE_INSENSITIVE_ORDER)
                         .collect(Collectors.toList());
-            } else {
-                return List.of("Penis");
             }
         }
 
