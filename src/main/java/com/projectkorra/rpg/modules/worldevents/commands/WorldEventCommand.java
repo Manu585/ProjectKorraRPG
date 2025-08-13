@@ -34,7 +34,7 @@ public class WorldEventCommand extends RPGCommand {
                 }
 
                 final String idPath = args.get(1);
-                final WorldEvent worldEvent = findByPath(idPath).orElse(null);
+                final WorldEvent worldEvent = manager.findEvent(idPath).orElse(null);
                 if (worldEvent == null) {
                     sender.sendMessage("WorldEvent " + idPath + " not found!");
                     return;
@@ -67,7 +67,7 @@ public class WorldEventCommand extends RPGCommand {
                 // STOP SPECIFIC
                 if (args.size() == 2) {
                     final String idPath = args.get(1);
-                    final WorldEvent we = findByPath(idPath).orElse(null);
+                    final WorldEvent we = manager.findEvent(idPath).orElse(null);
                     if (we == null) {
                         sender.sendMessage("WorldEvent '" + idPath + "' not found.");
                         return;
@@ -123,15 +123,5 @@ public class WorldEventCommand extends RPGCommand {
         }
 
         return Collections.emptyList();
-    }
-
-
-    private Optional<WorldEvent> findByPath(String path) {
-        if (path == null) return Optional.empty();
-        final String target = path.toLowerCase(Locale.ROOT);
-        return manager.getLoadedWorldEvents().entrySet().stream()
-                .filter(e -> e.getKey().getKey().equalsIgnoreCase(target))
-                .map(Map.Entry::getValue)
-                .findFirst();
     }
 }

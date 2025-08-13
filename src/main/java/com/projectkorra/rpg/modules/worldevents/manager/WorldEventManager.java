@@ -18,6 +18,7 @@ public class WorldEventManager {
     private final Map<NamespacedKey, WorldEvent> loadedWorldEvents = new HashMap<>();
     private final Map<WorldEvent, WorldEventRuntime> activeEvents = new HashMap<>();
     private final Map<UUID, Set<WorldEvent>> activeEventsByWorld = new HashMap<>();
+    private final Map<String, WorldEvent> loadedByPath = new HashMap<>();
 
     private final ProjectKorraRPG plugin;
 
@@ -27,7 +28,10 @@ public class WorldEventManager {
 
     public void register(WorldEvent worldEvent) {
         if (worldEvent == null) return;
+
         WorldEvent previous = loadedWorldEvents.put(worldEvent.getKey(), worldEvent);
+        loadedByPath.put(worldEvent.getKey().getKey().toLowerCase(Locale.ROOT), worldEvent);
+
         if (previous != null) {
             plugin.getLogger().warning("WorldEvent '" + worldEvent.getKey() + "' replaced an existing registration.");
 
@@ -37,6 +41,11 @@ public class WorldEventManager {
     public void registerAll(Collection<WorldEvent> worldEvents) {
         if (worldEvents == null) return;
         for (WorldEvent worldEvent : worldEvents) register(worldEvent);
+    }
+
+    public void clearAllRegistered() {
+        loadedWorldEvents.clear();
+        loadedByPath.clear();
     }
 
     // START / STOP HANDLING
@@ -132,6 +141,24 @@ public class WorldEventManager {
                 activeEventsByWorld.remove(worldId);
             }
         }
+    }
+
+    public Optional<WorldEvent> findEvent(String idOrKey) {
+        if (idOrKey == null || idOrKey.isBlank()) return Optional.empty();
+
+        String normalized = idOrKey.toLowerCase(Locale.ROOT);
+
+        WorldEvent byPath = loadedByPath.get(normalized);
+        if (byPath != null) return Optional.of(byPath);
+
+        NamespacedKey parsed = NamespacedKey.fromString(normalized);
+        if (parsed != null) {
+            WorldEvent byFullKey = loadedWorldEvents.get(parsed);
+            if (byFullKey != null) return Optional.of(byFullKey);
+        }
+
+        NamespacedKey defaulted = new NamespacedKey(plugin, normalized);
+        return Optional.ofNullable(loadedWorldEvents.get(defaulted));
     }
 
     public Map<NamespacedKey, WorldEvent> getLoadedWorldEvents() {
