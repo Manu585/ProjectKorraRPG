@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.worldevents.methods;
+package com.projectkorra.rpg.modules.worldevents.manager;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.attribute.AttributeModification;
@@ -6,7 +6,6 @@ import com.projectkorra.projectkorra.attribute.AttributeModifier;
 import com.projectkorra.projectkorra.attribute.AttributeUtil;
 import com.projectkorra.projectkorra.event.AbilityRecalculateAttributeEvent;
 import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.modules.worldevents.manager.WorldEventManager;
 import com.projectkorra.rpg.modules.worldevents.models.AttributeRules;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
 import commonslang3.projectkorra.lang3.tuple.Pair;

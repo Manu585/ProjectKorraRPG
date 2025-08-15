@@ -7,7 +7,7 @@ import com.projectkorra.rpg.modules.worldevents.listener.HandleWorldEventDisplay
 import com.projectkorra.rpg.modules.worldevents.listener.WorldEventModificationListener;
 import com.projectkorra.rpg.modules.worldevents.loader.WorldEventLoader;
 import com.projectkorra.rpg.modules.worldevents.manager.WorldEventManager;
-import com.projectkorra.rpg.modules.worldevents.methods.WorldEventModificationService;
+import com.projectkorra.rpg.modules.worldevents.manager.WorldEventModificationService;
 import org.bukkit.event.HandlerList;
 
 public class WorldEventModule extends Module {
