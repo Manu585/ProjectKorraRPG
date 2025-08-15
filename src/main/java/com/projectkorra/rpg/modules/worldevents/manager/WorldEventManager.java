@@ -1,5 +1,7 @@
 package com.projectkorra.rpg.modules.worldevents.manager;
 
+import com.projectkorra.projectkorra.ability.CoreAbility;
+import com.projectkorra.projectkorra.ability.util.PassiveManager;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStartEvent;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
@@ -62,6 +64,7 @@ public class WorldEventManager {
 
         WorldEventRuntime runtime = new WorldEventRuntime(plugin, worldEvent, this);
 
+        // Put events in corresponding maps
         indexActiveEvent(worldEvent, runtime);
 
         // Startup displays (create BossBar, send start message)
@@ -69,12 +72,20 @@ public class WorldEventManager {
             display.startDisplay(worldEvent);
         }
 
+        // Add all players in world to viewer Set (BossBar per Player management | Leave server, Switch world, etc.)
         for (Player player : worldEvent.getWorld().getPlayers()) {
             addViewer(worldEvent, player);
         }
 
-        Bukkit.getPluginManager().callEvent(new WorldEventStartEvent(worldEvent));
+        // Attributes for Already instantiated abilities (Passives) | Other abilities are being instantiated on left click or sneak so no loop necessary
+        for (CoreAbility ability : CoreAbility.getAbilitiesByInstances()) {
+            ability.recalculateAttributes();
+        }
+
         runtime.start();
+
+        // Call event for addons
+        Bukkit.getPluginManager().callEvent(new WorldEventStartEvent(worldEvent));
         return true;
     }
 
@@ -85,8 +96,6 @@ public class WorldEventManager {
             return false;
         }
 
-        Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(worldEvent));
-
         runtime.cancel();
 
         // Stop displays (unregister BossBar, send stop message)
@@ -94,7 +103,18 @@ public class WorldEventManager {
             display.stopDisplay(worldEvent);
         }
 
+        // Remove events from corresponding maps
         deindexActiveEvent(worldEvent);
+
+        // Loop for just passive abilities since they are rarely newly instantiated
+        for (CoreAbility passiveValues : PassiveManager.getPassives().values()) {
+            for (CoreAbility passives : CoreAbility.getAbilities(passiveValues.getClass())) {
+                passives.recalculateAttributes();
+            }
+        }
+
+        // Call event for addons
+        Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(worldEvent));
         return true;
     }
 
