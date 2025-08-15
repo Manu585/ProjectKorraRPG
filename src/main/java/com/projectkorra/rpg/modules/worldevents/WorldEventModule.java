@@ -49,7 +49,11 @@ public class WorldEventModule extends Module {
 	public void disable() {
 		this.getPlugin().getLogger().info("Disabling WorldEvent module...");
 
-        if (this.worldEventManager != null) this.worldEventManager.stopAll();
+        // Unregister Manager
+        if (this.worldEventManager != null) {
+            this.worldEventManager.stopAll();
+            this.worldEventManager = null;
+        }
 
 		// Unregister ModificationListener
 		if (this.modificationListener != null) {
@@ -57,6 +61,7 @@ public class WorldEventModule extends Module {
 			this.modificationListener = null;
 		}
 
+        // Unregister EventDisplayListener
         if (this.handleWorldEventDisplayListener != null) {
             HandlerList.unregisterAll(this.handleWorldEventDisplayListener);
             this.handleWorldEventDisplayListener = null;
