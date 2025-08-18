@@ -1,6 +1,5 @@
-package com.projectkorra.rpg.modules.worldevents.manager;
+package com.projectkorra.rpg.modules.worldevents.service;
 
-import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.attribute.AttributeModification;
 import com.projectkorra.projectkorra.attribute.AttributeModifier;
 import com.projectkorra.projectkorra.attribute.AttributeUtil;
@@ -8,9 +7,10 @@ import com.projectkorra.projectkorra.event.AbilityRecalculateAttributeEvent;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.models.AttributeRules;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.storage.ActiveWorldEventIndex;
 import commonslang3.projectkorra.lang3.tuple.Pair;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
+import org.bukkit.World;
 
 /**
  * A service class responsible for applying world-event-based attribute modifications to abilities.
@@ -19,26 +19,21 @@ import org.bukkit.entity.Player;
  * Has to listen to the {@link AbilityRecalculateAttributeEvent} to function.
  */
 public class WorldEventModificationService {
-    private final WorldEventManager manager;
+    private final ActiveWorldEventIndex activeEventsIndex;
 
-    public WorldEventModificationService(WorldEventManager manager) {
-        this.manager = manager;
+    public WorldEventModificationService(final ActiveWorldEventIndex activeEventsIndex) {
+        this.activeEventsIndex = activeEventsIndex;
     }
 
 	/**
-	 * Applies modifications from active WorldEvents to the abilities configured in the corresponding config
+	 * Applies modifications from active WorldEvents to the abilities / elements configured in the corresponding config
 	 */
-	public void applyWorldEventMods(AbilityRecalculateAttributeEvent event) {
-        final BendingPlayer bendingPlayer = event.getAbility().getBendingPlayer();
-        if (bendingPlayer == null) return;
-        final Player player = bendingPlayer.getPlayer();
-        if (player == null || !player.isOnline()) return;
-
+	public void applyWorldEventMods(AbilityRecalculateAttributeEvent event, World world) {
         final String element = event.getAbility().getElement().getName();
         final String ability = event.getAbility().getName();
         final String attribute = event.getAttribute();
 
-        for (WorldEvent worldEvent : manager.getActiveEventsInWorld(player.getWorld())) {
+        for (WorldEvent worldEvent : activeEventsIndex.getActiveIn(world)) {
             AttributeRules rules = worldEvent.getAttributeRules();
             if (rules == null) continue;
 
@@ -69,4 +64,8 @@ public class WorldEventModificationService {
 		ProjectKorraRPG.getPlugin().getLogger().warning("WorldEvent parse failed for key:" + key.getKey() + " raw:" + rawStr);
 		return null;
 	}
+
+    public ActiveWorldEventIndex getActiveEventsIndex() {
+        return activeEventsIndex;
+    }
 }

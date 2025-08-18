@@ -3,6 +3,7 @@ package com.projectkorra.rpg.modules.worldevents.display.chat;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
 import com.projectkorra.rpg.util.ChatUtil;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class ChatDisplay implements WorldEventDisplay {
@@ -15,17 +16,17 @@ public class ChatDisplay implements WorldEventDisplay {
 	}
 
 	@Override
-	public void startDisplay(WorldEvent event) {
-        if (startMessage == null || startMessage.isBlank()) return;
-        for (Player player : event.getWorld().getPlayers()) {
+	public void startDisplay(WorldEvent event, World world) {
+        if (startMessage == null || startMessage.isBlank() || world == null) return;
+        for (Player player : world.getPlayers()) {
             ChatUtil.sendBrandingMessage(player, startMessage);
         }
 	}
 
 	@Override
-	public void stopDisplay(WorldEvent event) {
-        if (stopMessage == null || stopMessage.isBlank()) return;
-        for (Player player : event.getWorld().getPlayers()) {
+	public void stopDisplay(WorldEvent event, World world) {
+        if (stopMessage == null || stopMessage.isBlank() || world == null) return;
+        for (Player player : world.getPlayers()) {
             ChatUtil.sendBrandingMessage(player, stopMessage);
         }
 	}

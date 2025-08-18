@@ -14,9 +14,11 @@ public class WorldEventBuilder {
     private NamespacedKey key;
     private String title;
     private Long duration;
-    private World world;
+
+    private final List<World> scheduledWorlds = new ArrayList<>();
     private final List<WorldEventDisplay> displays = new ArrayList<>();
     private final List<World> disabledWorlds = new ArrayList<>();
+
     private ScheduleSpecifications schedule;
     private AttributeRules attributeRules;
 
@@ -41,8 +43,18 @@ public class WorldEventBuilder {
         return this;
     }
 
+    @Deprecated
     public WorldEventBuilder world(final World world) {
-        this.world = world;
+        if (world != null) this.scheduledWorlds.add(world);
+        return this;
+    }
+
+    public WorldEventBuilder scheduledWorlds(final Collection<World> worlds) {
+        if (worlds != null) {
+            for (World world : worlds) {
+                if (world != null) this.scheduledWorlds.add(world);
+            }
+        }
         return this;
     }
 
@@ -85,7 +97,6 @@ public class WorldEventBuilder {
         if (key == null || key.getKey().isBlank()) errors.add("key is missing");
         if (title == null || title.isBlank()) errors.add("Title is missing / blank");
         if (duration == null || duration <= 0) errors.add("duration is missing / <= 0");
-        if (world == null) errors.add("world is missing");
 
         if (!errors.isEmpty()) {
             if (onError != null) {
@@ -98,7 +109,7 @@ public class WorldEventBuilder {
                         key,
                         title,
                         duration,
-                        world,
+                        List.copyOf(scheduledWorlds),
                         List.copyOf(displays),
                         List.copyOf(disabledWorlds),
                         schedule,

@@ -241,9 +241,13 @@ public class ConfigManager {
             List<String> disabledWorlds = new ArrayList<>();
             disabledWorlds.add("none");
 
+            List<String> scheduledWorlds = new ArrayList<>();
+            scheduledWorlds.add("world");
+
             config.addDefault("Title", "&cSozins Comet");
             config.addDefault("Duration", 5000);
-            config.addDefault("World", "world");
+
+            config.addDefault("Worlds", scheduledWorlds);
 
             config.addDefault("Schedule.At", "7am");
             config.addDefault("Schedule.Repeat", "7d");

@@ -7,6 +7,7 @@ import com.projectkorra.rpg.modules.worldevents.display.ViewerDisplay;
 import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
@@ -20,6 +21,9 @@ public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, Viewer
     private final boolean smooth;
 
     private KeyedBossBar bossBar;
+
+    private double lastProgress = -1.0;
+    private static final double PROGRESS_EPSILON = 0.01;
 
 	/**
 	 * @param barColor Color of BossBar
@@ -35,7 +39,7 @@ public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, Viewer
 	}
 
 	@Override
-	public void startDisplay(WorldEvent event) {
+	public void startDisplay(WorldEvent event, World world) {
         KeyedBossBar existing = Bukkit.getBossBar(key);
         this.bossBar = (existing != null) ? existing : Bukkit.createBossBar(key, ChatUtil.color(title), barColor, barStyle);
 
@@ -44,23 +48,30 @@ public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, Viewer
         bossBar.setStyle(barStyle);
         bossBar.setProgress(1.0);
         bossBar.setVisible(true);
+        bossBar.removeAll(); // WorldEventService handles viewers
 
-        bossBar.removeAll(); // WorldEventManager handles viewers
+        lastProgress = 1.0;
 	}
 
     @Override
     public void updateTick(WorldEvent event, double progress) {
         if (bossBar == null) return;
-        bossBar.setProgress(progress);
+
+        double clamped = (progress < 0.0) ? 0.0 : (Math.min(progress, 1.0));
+        if (Math.abs(clamped - lastProgress) >= PROGRESS_EPSILON) {
+            bossBar.setProgress(progress);
+            lastProgress = clamped;
+        }
     }
 
 	@Override
-	public void stopDisplay(WorldEvent event) {
+	public void stopDisplay(WorldEvent event, World world) {
         if (bossBar == null) return;
 
         bossBar.removeAll();
         Bukkit.removeBossBar(key);
         bossBar = null;
+        lastProgress = -1.0;
 	}
 
     @Override

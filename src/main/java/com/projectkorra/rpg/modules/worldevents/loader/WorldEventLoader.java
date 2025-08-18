@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class WorldEventLoader {
     private final ProjectKorraRPG plugin;
@@ -61,10 +62,11 @@ public class WorldEventLoader {
                 NamespacedKey key = new NamespacedKey(plugin, file.getName().substring(0, file.getName().length() - 4).toLowerCase(Locale.ROOT));
                 String title = config.getString("Title");
                 long duration = config.getLong("Duration");
-                String worldName = config.getString("World");
-                World world = (worldName == null || worldName.isBlank()) ? null : Bukkit.getWorld(worldName);
-                List<WorldEventDisplay> displays = parseDisplays(config, key, title);
+
+                List<World> scheduledWorlds = config.getStringList("Worlds").stream().map(Bukkit::getWorld).filter(Objects::nonNull).collect(Collectors.toList());
                 List<World> disabledWorlds = config.getStringList("DisabledWorlds").stream().map(Bukkit::getWorld).filter(Objects::nonNull).toList();
+                List<WorldEventDisplay> displays = parseDisplays(config, key, title);
+
                 AttributeRules attributeRules = parseAttributeRules(config);
                 ScheduleSpecifications scheduleSpecifications = parseSchedule(config);
 
@@ -73,7 +75,7 @@ public class WorldEventLoader {
                         .key(key)
                         .title(title)
                         .duration(duration)
-                        .world(world)
+                        .scheduledWorlds(scheduledWorlds)
                         .displays(displays)
                         .disabledWorlds(disabledWorlds)
                         .schedule(scheduleSpecifications)

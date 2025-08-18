@@ -1,20 +1,28 @@
 package com.projectkorra.rpg.modules.worldevents.commands;
 
 import com.projectkorra.rpg.commands.RPGCommand;
-import com.projectkorra.rpg.modules.worldevents.manager.WorldEventManager;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.service.WorldEventService;
+import com.projectkorra.rpg.modules.worldevents.storage.ActiveWorldEventIndex;
+import com.projectkorra.rpg.modules.worldevents.storage.WorldEventRegistry;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class WorldEventCommand extends RPGCommand {
-    private final WorldEventManager manager;
+    private final WorldEventService service;
+    private final WorldEventRegistry registry;
+    private final ActiveWorldEventIndex activeEventsIndex;
 
-	public WorldEventCommand(final WorldEventManager manager) {
+	public WorldEventCommand(final WorldEventService service, final WorldEventRegistry registry) {
 		super("event", "/bending rpg event start <id> | /bending rpg event stop <id>", "Manage worldevents", new String[]{"event", "e", "ev"});
-	    this.manager = manager;
+	    this.service = service;
+        this.registry = registry;
+        this.activeEventsIndex = service.getActiveEventsIndex();
     }
 
 	@Override
@@ -34,32 +42,40 @@ public class WorldEventCommand extends RPGCommand {
                 }
 
                 final String idPath = args.get(1);
-                final WorldEvent worldEvent = manager.findEvent(idPath).orElse(null);
+                final WorldEvent worldEvent = registry.findByPath(idPath).orElse(null);
                 if (worldEvent == null) {
                     sender.sendMessage("WorldEvent " + idPath + " not found!");
                     return;
                 }
-                if (manager.getActiveEvents().contains(worldEvent)) {
+                if (activeEventsIndex.activeWorldEvents().contains(worldEvent)) {
                     sender.sendMessage("Worldevent " + idPath + " is already active!");
                     return;
                 }
 
                 // START EVENT
-                if (manager.start(worldEvent)) {
-                    sender.sendMessage("Started WorldEvent '" + worldEvent.getKey().getKey() + "'");
+                boolean started;
+                if (sender instanceof Player player) {
+                    World world = player.getWorld();
+                    started = service.start(worldEvent, world);
                 } else {
-                    sender.sendMessage("Could not start WorldEvent '" + idPath + "'. Check logs for more details.");
+                    started = service.start(worldEvent);
+                }
+
+                if (started) {
+                    sender.sendMessage("Started WorldEvent '" + worldEvent.getKey().getKey() + "'.");
+                } else {
+                    sender.sendMessage("Could not start WorldEvent '" + idPath + "'. Check logs for details.");
                 }
             }
 
             case "stop" -> {
                 // STOP ALL
                 if (args.size() == 1) {
-                    if (manager.getActiveEvents().isEmpty()) {
+                    if (activeEventsIndex.activeWorldEvents().isEmpty()) {
                         sender.sendMessage("No active WorldEvents to stop.");
                         return;
                     }
-                    manager.stopAll();
+                    service.stopAll();
                     sender.sendMessage("Stopped all active WorldEvents.");
                     return;
                 }
@@ -67,16 +83,16 @@ public class WorldEventCommand extends RPGCommand {
                 // STOP SPECIFIC
                 if (args.size() == 2) {
                     final String idPath = args.get(1);
-                    final WorldEvent we = manager.findEvent(idPath).orElse(null);
+                    final WorldEvent we = registry.findByPath(idPath).orElse(null);
                     if (we == null) {
                         sender.sendMessage("WorldEvent '" + idPath + "' not found.");
                         return;
                     }
-                    if (!manager.getActiveEvents().contains(we)) {
+                    if (!activeEventsIndex.activeWorldEvents().contains(we)) {
                         sender.sendMessage("WorldEvent '" + idPath + "' is not active.");
                         return;
                     }
-                    if (manager.stop(we)) {
+                    if (service.stop(we)) {
                         sender.sendMessage("Stopped world event '" + we.getKey().getKey() + "'.");
                     } else {
                         sender.sendMessage("Could not stop world event '" + idPath + "'. Check logs for details.");
@@ -102,8 +118,8 @@ public class WorldEventCommand extends RPGCommand {
 
             if ("start".equals(first)) {
                 // Inactive events only
-                final Set<WorldEvent> active = manager.getActiveEvents();
-                return manager.getLoadedWorldEvents().entrySet().stream()
+                final Set<WorldEvent> active = activeEventsIndex.activeWorldEvents();
+                return registry.getAll().entrySet().stream()
                         .filter(e -> !active.contains(e.getValue()))
                         .map(e -> e.getKey().getKey())
                         .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
@@ -113,7 +129,7 @@ public class WorldEventCommand extends RPGCommand {
 
             if ("stop".equals(first)) {
                 // Active events only
-                return manager.getActiveEvents().stream()
+                return activeEventsIndex.activeWorldEvents().stream()
                         .map(WorldEvent::getKey)
                         .map(NamespacedKey::getKey)
                         .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
