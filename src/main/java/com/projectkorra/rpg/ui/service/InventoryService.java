@@ -15,7 +15,7 @@ public class InventoryService {
     public void open(Player player, InventoryUI ui) {
         InventoryUI old = openUis.put(player, ui);
 
-        // Close any prevously open menus
+        // Close any previously open menus
         if (old != null && old != ui) {
             old.onClose(player);
         }
