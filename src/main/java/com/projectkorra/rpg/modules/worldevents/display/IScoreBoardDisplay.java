@@ -1,4 +1,4 @@
 package com.projectkorra.rpg.modules.worldevents.display;
 
-public interface ChatDisplay {
+public interface IScoreBoardDisplay {
 }

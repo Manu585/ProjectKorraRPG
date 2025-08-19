@@ -1,12 +1,12 @@
 package com.projectkorra.rpg.modules.worldevents.display.chat;
 
-import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.IChatDisplay;
 import com.projectkorra.rpg.util.ChatUtil;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public class ChatDisplay implements WorldEventDisplay {
+import java.util.Collection;
+
+public class ChatDisplay implements IChatDisplay {
 	private final String startMessage;
 	private final String stopMessage;
 
@@ -15,19 +15,32 @@ public class ChatDisplay implements WorldEventDisplay {
 		this.stopMessage = stopMessage;
 	}
 
-	@Override
-	public void startDisplay(WorldEvent event, World world) {
-        if (startMessage == null || startMessage.isBlank() || world == null) return;
-        for (Player player : world.getPlayers()) {
-            ChatUtil.sendBrandingMessage(player, startMessage);
-        }
-	}
+    @Override
+    public void sendStartMessage(Player player) {
+        if (startMessage == null || startMessage.isBlank()) return;
+        ChatUtil.sendBrandingMessage(player, startMessage);
+    }
 
-	@Override
-	public void stopDisplay(WorldEvent event, World world) {
-        if (stopMessage == null || stopMessage.isBlank() || world == null) return;
-        for (Player player : world.getPlayers()) {
-            ChatUtil.sendBrandingMessage(player, stopMessage);
-        }
-	}
+    @Override
+    public void sendStopMessage(Player player) {
+        if (stopMessage == null || stopMessage.isBlank()) return;
+        ChatUtil.sendBrandingMessage(player, stopMessage);
+    }
+
+    @Override
+    public void sendStartMessage(Collection<Player> players) {
+        if (startMessage == null || startMessage.isBlank()) return;
+        players.forEach(player -> ChatUtil.sendBrandingMessage(player, startMessage));
+    }
+
+    @Override
+    public void sendStopMessage(Collection<Player> players) {
+        if (stopMessage == null || stopMessage.isBlank()) return;
+        players.forEach(player -> ChatUtil.sendBrandingMessage(player, stopMessage));
+    }
+
+    @Override
+    public void sendCurrentlyActiveMessage(Player player) {
+
+    }
 }

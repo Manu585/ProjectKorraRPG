@@ -266,12 +266,12 @@ public class ConfigManager {
             config.addDefault("DisplayMethods.Scoreboard.Enabled", false);
             config.addDefault("PlayEventStartSound", true);
             config.addDefault("EventStart.Sound", "entity.ender_dragon.growl");
-            config.addDefault("EventStart.Volume", "1");
-            config.addDefault("EventStart.Pitch", "0.5");
+            config.addDefault("EventStart.Volume", 1);
+            config.addDefault("EventStart.Pitch", 0.5);
             config.addDefault("PlayEventStopSound", true);
             config.addDefault("EventStop.Sound", "entity.ender_dragon.growl");
-            config.addDefault("EventStop.Volume", "1");
-            config.addDefault("EventStop.Pitch", "0.5");
+            config.addDefault("EventStop.Volume", 1);
+            config.addDefault("EventStop.Pitch", 0.5);
             config.addDefault("DisabledWorlds", disabledWorlds);
             config.addDefault("Abilities.Fire._All.Damage", "x2.0");
             config.addDefault("Abilities.Fire._All.Speed", "x2.0");

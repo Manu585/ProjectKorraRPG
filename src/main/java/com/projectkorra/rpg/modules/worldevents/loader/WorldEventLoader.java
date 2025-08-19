@@ -3,10 +3,11 @@ package com.projectkorra.rpg.modules.worldevents.loader;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.modules.worldevents.builder.WorldEventBuilder;
-import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.IChatDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.ISoundDisplay;
 import com.projectkorra.rpg.modules.worldevents.display.bossbar.BossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.display.chat.ChatDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.scoreboard.ScoreboardDisplay;
 import com.projectkorra.rpg.modules.worldevents.display.sound.SoundDisplay;
 import com.projectkorra.rpg.modules.worldevents.models.AttributeRules;
 import com.projectkorra.rpg.modules.worldevents.models.ScheduleSpecifications;
@@ -22,6 +23,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.time.Duration;
@@ -65,7 +67,10 @@ public class WorldEventLoader {
 
                 List<World> scheduledWorlds = config.getStringList("Worlds").stream().map(Bukkit::getWorld).filter(Objects::nonNull).collect(Collectors.toList());
                 List<World> disabledWorlds = config.getStringList("DisabledWorlds").stream().map(Bukkit::getWorld).filter(Objects::nonNull).toList();
-                List<WorldEventDisplay> displays = parseDisplays(config, key, title);
+
+                IChatDisplay chatDisplay = getChatDisplay(config);
+                IBossBarDisplay bossBarDisplay = getBossBarDisplay(config, key, title);
+                ISoundDisplay soundDisplay = getSoundDisplay(config);
 
                 AttributeRules attributeRules = parseAttributeRules(config);
                 ScheduleSpecifications scheduleSpecifications = parseSchedule(config);
@@ -76,7 +81,9 @@ public class WorldEventLoader {
                         .title(title)
                         .duration(duration)
                         .scheduledWorlds(scheduledWorlds)
-                        .displays(displays)
+                        .chatDisplay(chatDisplay)
+                        .bossBarDisplay(bossBarDisplay)
+                        .soundDisplay(soundDisplay)
                         .disabledWorlds(disabledWorlds)
                         .schedule(scheduleSpecifications)
                         .attributes(attributeRules);
@@ -102,68 +109,66 @@ public class WorldEventLoader {
         return result;
     }
 
-    private List<WorldEventDisplay> parseDisplays(FileConfiguration config, NamespacedKey key, String title) {
-        List<WorldEventDisplay> displays = new ArrayList<>();
+    private @Nullable IChatDisplay getChatDisplay(FileConfiguration config) {
+        if (!config.isConfigurationSection("DisplayMethods.Chat")) return null;
+        if (!config.getBoolean("DisplayMethods.Chat.Enabled")) return null;
 
-        // BOSS BAR
-        if (config.isConfigurationSection("DisplayMethods.BossBar") && config.isBoolean("DisplayMethods.BossBar.Enabled") && config.getBoolean("DisplayMethods.BossBar.Enabled")) {
-            String colorRaw = config.getString("DisplayMethods.BossBar.Color");
-            String styleRaw = config.getString("DisplayMethods.BossBar.Style");
+        String startMsg = config.getString("DisplayMethods.Chat.EventStartMessage");
+        String stopMsg = config.getString("DisplayMethods.Chat.EventStopMessage");
+        if (startMsg == null || startMsg.isBlank() || stopMsg == null || stopMsg.isBlank()) {
+            plugin.getLogger().warning("Chat enabled but start / stop message missing. Skipping Chat display!");
+            return null;
+        }
+        return new ChatDisplay(startMsg, stopMsg);
+    }
 
-            if (colorRaw == null || colorRaw.isBlank() || styleRaw == null || styleRaw.isBlank()) {
-                plugin.getLogger().warning("WorldEvent '" + key + "': BossBar enabled but Color/Style missing. Skipping BossBar display.");
-            } else {
-                BarColor color = RPGMethods.convertStringToBarColor(colorRaw);
-                BarStyle style = RPGMethods.convertStringToBarStyle(styleRaw);
-                boolean smooth = config.isBoolean("DisplayMethods.BossBar.Smooth") && config.getBoolean("DisplayMethods.BossBar.Smooth");
+    private @Nullable IBossBarDisplay getBossBarDisplay(FileConfiguration config, NamespacedKey key, String title) {
+        if (!config.isConfigurationSection("DisplayMethods.BossBar")) return null;
+        if (!config.getBoolean("DisplayMethods.BossBar.Enabled")) return null;
 
-                displays.add(new BossBarDisplay(key, title, color, style, smooth));
+        String colorRaw = config.getString("DisplayMethods.BossBar.Color");
+        String styleRaw = config.getString("DisplayMethods.BossBar.Style");
+        if (colorRaw == null || colorRaw.isBlank() || styleRaw == null || styleRaw.isBlank()) {
+            plugin.getLogger().warning("BossBar enabled but Color / Style missing. Skipping BossBar Display!");
+            return null;
+        }
+
+        BarColor color = RPGMethods.convertStringToBarColor(colorRaw);
+        BarStyle style = RPGMethods.convertStringToBarStyle(styleRaw);
+        boolean smooth = config.getBoolean("DisplayMethods.BossBar.Smooth", true);
+
+        return new BossBarDisplay(key, title, color, style, smooth);
+    }
+
+    private @Nullable ISoundDisplay getSoundDisplay(FileConfiguration config) {
+        Sound startSound = null;
+        float startVolume = 1F;
+        float startPitch = 1F;
+
+        if (config.getBoolean("PlayEventStartSound")) {
+            String soundId = config.getString("EventStart.Sound");
+            if (soundId != null && !soundId.isBlank()) {
+                startSound = RPGMethods.resolveSound(soundId);
+                startVolume = (float) config.getDouble("EventStart.Volume");
+                startPitch = (float) config.getDouble("EventStart.Pitch");
             }
         }
 
-        // CHAT
-        if (config.isConfigurationSection("DisplayMethods.Chat") && config.isBoolean("DisplayMethods.Chat.Enabled") && config.getBoolean("DisplayMethods.Chat.Enabled")) {
-            String startMsg = config.getString("DisplayMethods.Chat.EventStartMessage");
-            String stopMsg = config.getString("DisplayMethods.Chat.EventStopMessage");
+        Sound stopSound = null;
+        float stopVolume = 1F;
+        float stopPitch = 1F;
 
-            if (startMsg == null || startMsg.isBlank() || stopMsg == null || stopMsg.isBlank()) {
-                plugin.getLogger().warning("WorldEvent '" + key + "': Chat enabled but start/stop message missing. Skipping Chat display.");
-            } else {
-                displays.add(new ChatDisplay(startMsg, stopMsg));
+        if (config.getBoolean("PlayEventStopSound")) {
+            String soundId = config.getString("EventStop.Sound");
+            if (soundId != null && !soundId.isBlank()) {
+                stopSound = RPGMethods.resolveSound(soundId);
+                stopVolume = (float) config.getDouble("EventStop.Volume");
+                stopPitch = (float) config.getDouble("EventStop.Pitch");
             }
         }
 
-        // SCOREBOARD
-        if (config.isConfigurationSection("DisplayMethods.Scoreboard") && config.isBoolean("DisplayMethods.Scoreboard.Enabled") && config.getBoolean("DisplayMethods.Scoreboard.Enabled")) {
-            displays.add(new ScoreboardDisplay());
-        }
-
-        // SOUND
-        Sound startSound = null; float startVolume = 1F; float startPitch = 1F;
-        if (config.getBoolean("PlayEventStartSound", false)) {
-            String id = config.getString("EventStart.Sound");
-            if (id != null && !id.isBlank()) {
-                startSound = RPGMethods.resolveSound(id);
-                startVolume = (float) config.getDouble("EventStart.Volume", 1F);
-                startPitch = (float) config.getDouble("EventStart.Pitch", 1F);
-            }
-        }
-
-        Sound stopSound = null; float stopVolume = 1F; float stopPitch = 1F;
-        if (config.getBoolean("PlayEventStopSound", false)) {
-            String id = config.getString("EventStop.Sound");
-            if (id != null && !id.isBlank()) {
-                stopSound = RPGMethods.resolveSound(id);
-                stopVolume = (float) config.getDouble("EventStop.Volume", 1F);
-                stopPitch = (float) config.getDouble("EventStop.Pitch", 1F);
-            }
-        }
-
-        if (startSound != null || stopSound != null) {
-            displays.add(new SoundDisplay(startSound, startVolume, startPitch, stopSound, stopVolume, stopPitch));
-        }
-
-        return displays;
+        if (startSound == null && stopSound == null) return null;
+        return new SoundDisplay(startSound, startVolume, startPitch, stopSound, stopVolume, stopPitch);
     }
 
     private AttributeRules parseAttributeRules(FileConfiguration config) {

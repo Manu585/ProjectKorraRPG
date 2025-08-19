@@ -1,10 +1,13 @@
 package com.projectkorra.rpg.modules.worldevents.models;
 
-import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.IChatDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.ISoundDisplay;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,19 +18,24 @@ public final class WorldEvent implements Keyed {
     private final long duration;
 
     private final List<World> scheduledWorlds;
-    private final List<WorldEventDisplay> displayMethods;
     private final List<World> disabledWorlds;
+
+    private final @Nullable IChatDisplay chatDisplay;
+    private final @Nullable IBossBarDisplay bossBarDisplay;
+    private final @Nullable ISoundDisplay soundDisplay;
 
     private final ScheduleSpecifications scheduleSpecifications;
     private final AttributeRules attributeRules;
 
-    public WorldEvent(NamespacedKey key, String title, long duration, List<World> scheduledWorlds, List<WorldEventDisplay> displayMethods, List<World> disabledWorlds, ScheduleSpecifications scheduleSpecifications, AttributeRules attributeRules) {
+    public WorldEvent(NamespacedKey key, String title, long duration, List<World> scheduledWorlds, @Nullable IChatDisplay chatDisplay, @Nullable IBossBarDisplay bossBarDisplay, @Nullable ISoundDisplay soundDisplay, List<World> disabledWorlds, ScheduleSpecifications scheduleSpecifications, AttributeRules attributeRules) {
         this.key = key;
         this.title = title;
         this.duration = duration;
-        this.scheduledWorlds = scheduledWorlds == null ? List.of() : List.copyOf(scheduledWorlds);
-        this.displayMethods = displayMethods == null ? List.of() : List.copyOf(displayMethods);
-        this.disabledWorlds = disabledWorlds == null ? List.of() : List.copyOf(disabledWorlds);
+        this.scheduledWorlds = scheduledWorlds == null ? List.of() : java.util.List.copyOf(scheduledWorlds);
+        this.disabledWorlds = disabledWorlds == null ? List.of() : java.util.List.copyOf(disabledWorlds);
+        this.chatDisplay = chatDisplay;
+        this.bossBarDisplay = bossBarDisplay;
+        this.soundDisplay = soundDisplay;
         this.scheduleSpecifications = scheduleSpecifications;
         this.attributeRules = attributeRules;
     }
@@ -49,16 +57,24 @@ public final class WorldEvent implements Keyed {
         return scheduledWorlds;
     }
 
-    public List<WorldEventDisplay> getDisplayMethods() {
-        return displayMethods;
-    }
-
     public List<World> getDisabledWorlds() {
         return disabledWorlds;
     }
 
     public boolean isWorldDisabled(World world) {
         return world != null && disabledWorlds.contains(world);
+    }
+
+    public @Nullable IChatDisplay getChatDisplay() {
+        return chatDisplay;
+    }
+
+    public @Nullable IBossBarDisplay getBossBarDisplay() {
+        return bossBarDisplay;
+    }
+
+    public @Nullable ISoundDisplay getSoundDisplay() {
+        return soundDisplay;
     }
 
     public ScheduleSpecifications getScheduleSpecifications() {
@@ -100,7 +116,6 @@ public final class WorldEvent implements Keyed {
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
                 ", scheduledWorlds=" + scheduled +
-                ", displays=" + displayMethods.size() +
                 ", disabledWorlds=" + disabled +
                 "}";
     }

@@ -3,16 +3,16 @@ package com.projectkorra.rpg.modules.worldevents.display.bossbar;
 import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
 
-public class BossBarDisplay implements WorldEventDisplay, IBossBarDisplay {
+import java.util.Collection;
+
+public class BossBarDisplay implements IBossBarDisplay {
     private final NamespacedKey key;
     private final String title;
     private final BarColor barColor;
@@ -38,7 +38,7 @@ public class BossBarDisplay implements WorldEventDisplay, IBossBarDisplay {
 	}
 
 	@Override
-	public void startDisplay(WorldEvent event, World world) {
+	public void start(WorldEvent event) {
         KeyedBossBar existing = Bukkit.getBossBar(key);
         this.bossBar = (existing != null) ? existing : Bukkit.createBossBar(key, ChatUtil.color(title), barColor, barStyle);
 
@@ -53,6 +53,21 @@ public class BossBarDisplay implements WorldEventDisplay, IBossBarDisplay {
 	}
 
     @Override
+    public void stop(WorldEvent event) {
+        if (bossBar == null) return;
+
+        bossBar.removeAll();
+        Bukkit.removeBossBar(key);
+        bossBar = null;
+        lastProgress = -1.0;
+    }
+
+    @Override
+    public long tickPeriod() {
+        return smooth ? 1L : 20L;
+    }
+
+    @Override
     public void updateTick(WorldEvent event, double progress) {
         if (bossBar == null) return;
 
@@ -63,21 +78,6 @@ public class BossBarDisplay implements WorldEventDisplay, IBossBarDisplay {
         }
     }
 
-	@Override
-	public void stopDisplay(WorldEvent event, World world) {
-        if (bossBar == null) return;
-
-        bossBar.removeAll();
-        Bukkit.removeBossBar(key);
-        bossBar = null;
-        lastProgress = -1.0;
-	}
-
-    @Override
-    public long tickPeriod() {
-        return smooth ? 1L : 20L;
-    }
-
     @Override
     public void addViewer(Player viewer) {
         if (bossBar != null) bossBar.addPlayer(viewer);
@@ -86,5 +86,19 @@ public class BossBarDisplay implements WorldEventDisplay, IBossBarDisplay {
     @Override
     public void removeViewer(Player viewer) {
         if (bossBar != null) bossBar.removePlayer(viewer);
+    }
+
+    @Override
+    public void addViewers(Collection<Player> viewers) {
+        if (bossBar != null) {
+            viewers.forEach(viewer -> bossBar.addPlayer(viewer));
+        }
+    }
+
+    @Override
+    public void removeViewers(Collection<Player> viewers) {
+        if (bossBar != null) {
+            viewers.forEach(viewer -> bossBar.removePlayer(viewer));
+        }
     }
 }

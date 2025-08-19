@@ -1,17 +1,21 @@
 package com.projectkorra.rpg.modules.worldevents.models;
 
 import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.IChatDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.ISoundDisplay;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class ActiveWorldEvent {
-    private final Set<UUID> viewers = new HashSet<>();
-    private final List<IBossBarDisplay> bossBarDisplay = new ArrayList<>();
-
     private final WorldEvent worldEvent;
+    private final Set<UUID> viewers = new HashSet<>();
+
+    private final IChatDisplay chatDisplay;
+    private final IBossBarDisplay bossBarDisplay;
+    private final ISoundDisplay soundDisplay;
+
     private final World runtimeWorld;
     private final long updateEveryTicks;
     private final boolean requiresTicking;
@@ -21,37 +25,53 @@ public class ActiveWorldEvent {
 
     public ActiveWorldEvent(final WorldEvent worldEvent, final World runtimeWorld) {
         this.worldEvent = worldEvent;
+        this.chatDisplay = worldEvent.getChatDisplay();
+        this.bossBarDisplay = worldEvent.getBossBarDisplay();
+        this.soundDisplay = worldEvent.getSoundDisplay();
         this.runtimeWorld = runtimeWorld;
 
-        for (WorldEventDisplay display : worldEvent.getDisplayMethods()) {
-            if (display instanceof IBossBarDisplay bossDisplay) {
-                this.bossBarDisplay.add(bossDisplay);
-            }
-        }
-
-        this.requiresTicking = !bossBarDisplay.isEmpty();
+        this.requiresTicking = bossBarDisplay != null;
         this.updateEveryTicks = computePeriod(bossBarDisplay);
     }
 
     public void start() {
         this.startTime = System.currentTimeMillis();
+        this.startDisplays();
+    }
 
-        // Start Display: Create BossBar, send chat, etc.
-        for (WorldEventDisplay display : worldEvent.getDisplayMethods()) {
-            display.startDisplay(worldEvent, runtimeWorld);
+    private void startDisplays() {
+        if (chatDisplay != null) {
+            chatDisplay.sendStartMessage(runtimeWorld.getPlayers());
         }
 
-        // Actually put viewers in viewers map (Display BossBar)
-        for (Player viewer : runtimeWorld.getPlayers()) {
-            addViewer(viewer);
+        if (bossBarDisplay != null) {
+            bossBarDisplay.start(worldEvent);
+            bossBarDisplay.addViewers(runtimeWorld.getPlayers());
+        }
+
+        if (soundDisplay != null) {
+            soundDisplay.playStartSound(runtimeWorld.getPlayers());
         }
     }
 
     public void stop() {
-        for (WorldEventDisplay display : worldEvent.getDisplayMethods()) {
-            display.stopDisplay(worldEvent, runtimeWorld);
-        }
+        this.stopDisplays();
         viewers.clear();
+    }
+
+    private void stopDisplays() {
+        if (chatDisplay != null) {
+            chatDisplay.sendStopMessage(runtimeWorld.getPlayers());
+        }
+
+        if (bossBarDisplay != null) {
+            bossBarDisplay.stop(worldEvent);
+            bossBarDisplay.removeViewers(runtimeWorld.getPlayers());
+        }
+
+        if (soundDisplay != null) {
+            soundDisplay.playStopSound(runtimeWorld.getPlayers());
+        }
     }
 
     /**
@@ -71,15 +91,15 @@ public class ActiveWorldEvent {
         double progress = 1.0 - (elapsed / (double) worldEvent.getDuration());
 
         if (progress <= 0.0) {
-            for (IBossBarDisplay bossBar : bossBarDisplay) {
-                bossBar.updateTick(worldEvent, 0.0);
+            if (bossBarDisplay != null) {
+                bossBarDisplay.updateTick(worldEvent, 0.0);
             }
             return true; // Expired
         }
 
         double clamped = Math.min(progress, 1.0);
-        for (IBossBarDisplay bossBar : bossBarDisplay) {
-            bossBar.updateTick(worldEvent, clamped);
+        if (bossBarDisplay != null) {
+            bossBarDisplay.updateTick(worldEvent, clamped);
         }
 
         return false;
@@ -88,10 +108,8 @@ public class ActiveWorldEvent {
     public void addViewer(Player viewer) {
         if (viewer == null || !viewer.isOnline()) return;
         if (viewers.add(viewer.getUniqueId())) {
-            for (WorldEventDisplay display : worldEvent.getDisplayMethods()) {
-                if (display instanceof IBossBarDisplay bossBar) {
-                    bossBar.addViewer(viewer);
-                }
+            if (bossBarDisplay != null) {
+                bossBarDisplay.addViewer(viewer);
             }
         }
     }
@@ -99,22 +117,20 @@ public class ActiveWorldEvent {
     public void removeViewer(Player viewer) {
         if (viewer == null || !viewer.isOnline()) return;
         if (viewers.remove(viewer.getUniqueId())) {
-            for (WorldEventDisplay display : worldEvent.getDisplayMethods()) {
-                if (display instanceof IBossBarDisplay bossBar) {
-                    bossBar.removeViewer(viewer);
-                }
+            if (bossBarDisplay != null) {
+                bossBarDisplay.removeViewer(viewer);
             }
         }
     }
 
-    private static long computePeriod(List<IBossBarDisplay> list) {
-        if (list.isEmpty()) return 20L;
+    private static long computePeriod(IBossBarDisplay display) {
+        if (display == null) return 20L;
+
         long min = Long.MAX_VALUE;
-        for (IBossBarDisplay bb : list) {
-            long p = bb.tickPeriod();
-            if (p < 1L) p = 1L;
-            if (p < min) min = p;
-        }
+        long p = display.tickPeriod();
+        if (p < 1L) p = 1L;
+        if (p < min) min = p;
+
         return (min == Long.MAX_VALUE) ? 20L : min;
     }
 
