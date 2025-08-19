@@ -1,9 +1,8 @@
 package com.projectkorra.rpg.modules.worldevents.display.bossbar;
 
 import com.projectkorra.projectkorra.util.ChatUtil;
+import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.display.TickingDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.ViewerDisplay;
 import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -13,7 +12,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
 
-public class BossBarDisplay implements WorldEventDisplay, TickingDisplay, ViewerDisplay {
+public class BossBarDisplay implements WorldEventDisplay, IBossBarDisplay {
     private final NamespacedKey key;
     private final String title;
     private final BarColor barColor;

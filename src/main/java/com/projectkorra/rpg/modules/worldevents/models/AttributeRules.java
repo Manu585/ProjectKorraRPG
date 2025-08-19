@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+// ToDo: Make new, GPT generated test and stream usage generates unnecessary overhead
 public final class AttributeRules {
     private final Map<String, Object> global; // attr -> value
     private final Map<String, Map<String, Object>> byElement; // element -> (attr -> value)

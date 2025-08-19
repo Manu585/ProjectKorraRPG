@@ -1,7 +1,6 @@
 package com.projectkorra.rpg.modules.worldevents.models;
 
-import com.projectkorra.rpg.modules.worldevents.display.TickingDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.ViewerDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -10,7 +9,7 @@ import java.util.*;
 
 public class ActiveWorldEvent {
     private final Set<UUID> viewers = new HashSet<>();
-    private final List<TickingDisplay> tickingDisplays = new ArrayList<>();
+    private final List<IBossBarDisplay> bossBarDisplay = new ArrayList<>();
 
     private final WorldEvent worldEvent;
     private final World runtimeWorld;
@@ -25,13 +24,13 @@ public class ActiveWorldEvent {
         this.runtimeWorld = runtimeWorld;
 
         for (WorldEventDisplay display : worldEvent.getDisplayMethods()) {
-            if (display instanceof TickingDisplay ticking) {
-                tickingDisplays.add(ticking);
+            if (display instanceof IBossBarDisplay bossDisplay) {
+                this.bossBarDisplay.add(bossDisplay);
             }
         }
 
-        this.requiresTicking = !tickingDisplays.isEmpty();
-        this.updateEveryTicks = computePeriod(tickingDisplays);
+        this.requiresTicking = !bossBarDisplay.isEmpty();
+        this.updateEveryTicks = computePeriod(bossBarDisplay);
     }
 
     public void start() {
@@ -72,15 +71,15 @@ public class ActiveWorldEvent {
         double progress = 1.0 - (elapsed / (double) worldEvent.getDuration());
 
         if (progress <= 0.0) {
-            for (TickingDisplay display : tickingDisplays) {
-                display.updateTick(worldEvent, 0.0);
+            for (IBossBarDisplay bossBar : bossBarDisplay) {
+                bossBar.updateTick(worldEvent, 0.0);
             }
             return true; // Expired
         }
 
         double clamped = Math.min(progress, 1.0);
-        for (TickingDisplay display : tickingDisplays) {
-            display.updateTick(worldEvent, clamped);
+        for (IBossBarDisplay bossBar : bossBarDisplay) {
+            bossBar.updateTick(worldEvent, clamped);
         }
 
         return false;
@@ -90,8 +89,8 @@ public class ActiveWorldEvent {
         if (viewer == null || !viewer.isOnline()) return;
         if (viewers.add(viewer.getUniqueId())) {
             for (WorldEventDisplay display : worldEvent.getDisplayMethods()) {
-                if (display instanceof ViewerDisplay viewerDisplay) {
-                    viewerDisplay.addViewer(viewer);
+                if (display instanceof IBossBarDisplay bossBar) {
+                    bossBar.addViewer(viewer);
                 }
             }
         }
@@ -101,18 +100,18 @@ public class ActiveWorldEvent {
         if (viewer == null || !viewer.isOnline()) return;
         if (viewers.remove(viewer.getUniqueId())) {
             for (WorldEventDisplay display : worldEvent.getDisplayMethods()) {
-                if (display instanceof ViewerDisplay viewerDisplay) {
-                    viewerDisplay.removeViewer(viewer);
+                if (display instanceof IBossBarDisplay bossBar) {
+                    bossBar.removeViewer(viewer);
                 }
             }
         }
     }
 
-    private static long computePeriod(List<TickingDisplay> list) {
+    private static long computePeriod(List<IBossBarDisplay> list) {
         if (list.isEmpty()) return 20L;
         long min = Long.MAX_VALUE;
-        for (TickingDisplay td : list) {
-            long p = td.tickPeriod();
+        for (IBossBarDisplay bb : list) {
+            long p = bb.tickPeriod();
             if (p < 1L) p = 1L;
             if (p < min) min = p;
         }
