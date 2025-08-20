@@ -71,6 +71,12 @@ public class WorldEventModule extends Module {
             this.worldEventRegistry = null;
         }
 
+        // Cleanup Active Events Index
+        if (this.activeWorldEventIndex != null) {
+            this.activeWorldEventIndex.clearAll();
+            this.activeWorldEventIndex = null;
+        }
+
 		// Unregister ModificationListener
 		if (this.modificationListener != null) {
 			HandlerList.unregisterAll(this.modificationListener);
@@ -86,7 +92,7 @@ public class WorldEventModule extends Module {
         // Remove Stale / Dead BossBars
         BossBarCleanup.removeAllFor(this.getPlugin());
 
-		this.getPlugin().getLogger().info("WorldEvent module disabled successfully!");
+		this.getPlugin().getLogger().info(getName() + " module disabled successfully!");
 	}
 
     public WorldEventService getWorldEventService() {

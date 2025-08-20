@@ -261,8 +261,9 @@ public class ConfigManager {
             config.addDefault("DisplayMethods.BossBar.Style", "SOLID");
             config.addDefault("DisplayMethods.BossBar.Smooth", true);
             config.addDefault("DisplayMethods.Chat.Enabled", true);
-            config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Firebenders bending has been extremely hightened");
-            config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozins Comet has left the world's atmosphere. Firebenders bending has been normalized");
+            config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Fire benders bending has been extremely heightened!");
+            config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozins Comet has left the world's atmosphere. Fire benders bending has been normalized!");
+            config.addDefault("DisplayMethods.Chat.EventCurrentlyRunning", "&cSozins Comet is currently in the world's atmosphere. Fire benders bending is extremely heightened!");
             config.addDefault("DisplayMethods.Scoreboard.Enabled", false);
             config.addDefault("PlayEventStartSound", true);
             config.addDefault("EventStart.Sound", "entity.ender_dragon.growl");

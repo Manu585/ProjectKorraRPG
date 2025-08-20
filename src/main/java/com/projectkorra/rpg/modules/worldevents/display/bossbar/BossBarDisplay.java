@@ -27,7 +27,7 @@ public class BossBarDisplay implements IBossBarDisplay {
 	/**
 	 * @param barColor Color of BossBar
 	 * @param barStyle Style of BossBar
-	 * @param smooth   <code>true</code> Refresh every tick <code>else</code> every second
+	 * @param smooth <code>true</code> Refresh every tick <code>else</code> every second
 	 */
 	public BossBarDisplay(NamespacedKey key, String title, BarColor barColor, BarStyle barStyle, boolean smooth) {
         this.key = key;
@@ -80,25 +80,25 @@ public class BossBarDisplay implements IBossBarDisplay {
 
     @Override
     public void addViewer(Player viewer) {
-        if (bossBar != null) bossBar.addPlayer(viewer);
+        if (viewer == null || !viewer.isOnline() || bossBar == null) return;
+        bossBar.addPlayer(viewer);
     }
 
     @Override
     public void removeViewer(Player viewer) {
-        if (bossBar != null) bossBar.removePlayer(viewer);
+        if (viewer == null || !viewer.isOnline() || bossBar == null) return;
+        bossBar.removePlayer(viewer);
     }
 
     @Override
     public void addViewers(Collection<Player> viewers) {
-        if (bossBar != null) {
-            viewers.forEach(viewer -> bossBar.addPlayer(viewer));
-        }
+        if (viewers == null || viewers.isEmpty() || bossBar == null) return;
+        viewers.forEach(viewer -> bossBar.addPlayer(viewer));
     }
 
     @Override
     public void removeViewers(Collection<Player> viewers) {
-        if (bossBar != null) {
-            viewers.forEach(viewer -> bossBar.removePlayer(viewer));
-        }
+        if (viewers == null || viewers.isEmpty() || bossBar == null) return;
+        viewers.forEach(viewer -> bossBar.removePlayer(viewer));
     }
 }

@@ -21,11 +21,11 @@ public class WorldEventBuilder {
     private final List<World> scheduledWorlds = new ArrayList<>();
     private final List<World> disabledWorlds = new ArrayList<>();
 
-    private IChatDisplay chatDisplay;
-    private IBossBarDisplay bossBarDisplay;
-    private ISoundDisplay soundDisplay;
+    private @Nullable IChatDisplay chatDisplay;
+    private @Nullable IBossBarDisplay bossBarDisplay;
+    private @Nullable ISoundDisplay soundDisplay;
 
-    private ScheduleSpecifications schedule;
+    private @Nullable ScheduleSpecifications schedule;
     private AttributeRules attributeRules;
 
     private WorldEventBuilder() {}
@@ -64,21 +64,21 @@ public class WorldEventBuilder {
         return this;
     }
 
-    public WorldEventBuilder chatDisplay(@Nullable IChatDisplay chatDisplay) {
+    public WorldEventBuilder chatDisplay(final @Nullable IChatDisplay chatDisplay) {
         if (chatDisplay != null) {
             this.chatDisplay = chatDisplay;
         }
         return this;
     }
 
-    public WorldEventBuilder bossBarDisplay(@Nullable IBossBarDisplay bossBarDisplay) {
+    public WorldEventBuilder bossBarDisplay(final @Nullable IBossBarDisplay bossBarDisplay) {
         if (bossBarDisplay != null) {
             this.bossBarDisplay = bossBarDisplay;
         }
         return this;
     }
 
-    public WorldEventBuilder soundDisplay(@Nullable ISoundDisplay soundDisplay) {
+    public WorldEventBuilder soundDisplay(final @Nullable ISoundDisplay soundDisplay) {
         if (soundDisplay != null) {
             this.soundDisplay = soundDisplay;
         }
@@ -94,8 +94,10 @@ public class WorldEventBuilder {
         return this;
     }
 
-    public WorldEventBuilder schedule(final ScheduleSpecifications schedule) {
-        this.schedule = schedule;
+    public WorldEventBuilder schedule(final @Nullable ScheduleSpecifications schedule) {
+        if (schedule != null) {
+            this.schedule = schedule;
+        }
         return this;
     }
 
@@ -111,28 +113,28 @@ public class WorldEventBuilder {
         if (title == null || title.isBlank()) errors.add("Title is missing / blank");
         if (duration == null || duration <= 0) errors.add("duration is missing / <= 0");
 
+        // Failed
         if (!errors.isEmpty()) {
             if (onError != null) {
-                for (String error : errors) onError.accept(error);
+                for (String error : errors) {
+                    onError.accept(error);
+                }
             }
             return Optional.empty();
         }
 
+        // Success
         return Optional.of(new WorldEvent(
                         key,
                         title,
                         duration,
                         List.copyOf(scheduledWorlds),
+                        List.copyOf(disabledWorlds),
                         chatDisplay,
                         bossBarDisplay,
                         soundDisplay,
-                        List.copyOf(disabledWorlds),
                         schedule,
                         attributeRules
         ));
-    }
-
-    public WorldEvent buildOrThrow() {
-        return tryBuild(msg -> {}).orElseThrow(() -> new IllegalStateException("WorldEventBuilder has invalid state!"));
     }
 }

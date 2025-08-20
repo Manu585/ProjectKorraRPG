@@ -24,10 +24,21 @@ public final class WorldEvent implements Keyed {
     private final @Nullable IBossBarDisplay bossBarDisplay;
     private final @Nullable ISoundDisplay soundDisplay;
 
-    private final ScheduleSpecifications scheduleSpecifications;
+    private final @Nullable ScheduleSpecifications scheduleSpecifications;
     private final AttributeRules attributeRules;
 
-    public WorldEvent(NamespacedKey key, String title, long duration, List<World> scheduledWorlds, @Nullable IChatDisplay chatDisplay, @Nullable IBossBarDisplay bossBarDisplay, @Nullable ISoundDisplay soundDisplay, List<World> disabledWorlds, ScheduleSpecifications scheduleSpecifications, AttributeRules attributeRules) {
+    public WorldEvent(
+            NamespacedKey key,
+            String title,
+            long duration,
+            List<World> scheduledWorlds,
+            List<World> disabledWorlds,
+            @Nullable IChatDisplay chatDisplay,
+            @Nullable IBossBarDisplay bossBarDisplay,
+            @Nullable ISoundDisplay soundDisplay,
+            @Nullable ScheduleSpecifications scheduleSpecifications,
+            AttributeRules attributeRules)
+    {
         this.key = key;
         this.title = title;
         this.duration = duration;
@@ -77,7 +88,7 @@ public final class WorldEvent implements Keyed {
         return soundDisplay;
     }
 
-    public ScheduleSpecifications getScheduleSpecifications() {
+    public @Nullable ScheduleSpecifications getScheduleSpecifications() {
         return scheduleSpecifications;
     }
 

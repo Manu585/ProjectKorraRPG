@@ -48,7 +48,7 @@ public class WorldEventCommand extends RPGCommand {
                     return;
                 }
                 if (activeEventsIndex.activeWorldEvents().contains(worldEvent)) {
-                    sender.sendMessage("Worldevent " + idPath + " is already active!");
+                    sender.sendMessage("WorldEvent " + idPath + " is already active!");
                     return;
                 }
 
@@ -119,7 +119,7 @@ public class WorldEventCommand extends RPGCommand {
             if ("start".equals(first)) {
                 // Inactive events only
                 final Set<WorldEvent> active = activeEventsIndex.activeWorldEvents();
-                return registry.getAll().entrySet().stream()
+                return registry.getAll().entrySet().stream().parallel()
                         .filter(e -> !active.contains(e.getValue()))
                         .map(e -> e.getKey().getKey())
                         .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
@@ -129,7 +129,7 @@ public class WorldEventCommand extends RPGCommand {
 
             if ("stop".equals(first)) {
                 // Active events only
-                return activeEventsIndex.activeWorldEvents().stream()
+                return activeEventsIndex.activeWorldEvents().stream().parallel()
                         .map(WorldEvent::getKey)
                         .map(NamespacedKey::getKey)
                         .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))

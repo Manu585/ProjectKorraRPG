@@ -29,7 +29,6 @@ import java.io.File;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class WorldEventLoader {
@@ -88,10 +87,8 @@ public class WorldEventLoader {
                         .schedule(scheduleSpecifications)
                         .attributes(attributeRules);
 
-                Consumer<String> log = msg -> plugin.getLogger().warning("Skipping '" + file.getName() + "': " + msg);
-
                 // TRY TO BUILD
-                Optional<WorldEvent> built = builder.tryBuild(log);
+                Optional<WorldEvent> built = builder.tryBuild(msg -> plugin.getLogger().warning("Skipping '" + file.getName() + "': " + msg));
                 if (built.isPresent()) {
                     // NON-NULL VALUES = Success
                     result.put(key, built.get());
@@ -115,11 +112,12 @@ public class WorldEventLoader {
 
         String startMsg = config.getString("DisplayMethods.Chat.EventStartMessage");
         String stopMsg = config.getString("DisplayMethods.Chat.EventStopMessage");
-        if (startMsg == null || startMsg.isBlank() || stopMsg == null || stopMsg.isBlank()) {
-            plugin.getLogger().warning("Chat enabled but start / stop message missing. Skipping Chat display!");
+        String runningMsg = config.getString("DisplayMethods.Chat.EventCurrentlyRunning");
+        if (startMsg == null || startMsg.isBlank() || stopMsg == null || stopMsg.isBlank() || runningMsg == null || runningMsg.isBlank()) {
+            plugin.getLogger().warning("Chat enabled but start / stop /running message missing. Skipping Chat display!");
             return null;
         }
-        return new ChatDisplay(startMsg, stopMsg);
+        return new ChatDisplay(startMsg, stopMsg, runningMsg);
     }
 
     private @Nullable IBossBarDisplay getBossBarDisplay(FileConfiguration config, NamespacedKey key, String title) {
@@ -219,7 +217,7 @@ public class WorldEventLoader {
     /**
      * TEMP METHOD
      */
-    private ScheduleSpecifications parseSchedule(FileConfiguration config) {
+    private @Nullable ScheduleSpecifications parseSchedule(FileConfiguration config) {
         ConfigurationSection sec = config.getConfigurationSection("Schedule");
         if (sec == null) {
             return null;

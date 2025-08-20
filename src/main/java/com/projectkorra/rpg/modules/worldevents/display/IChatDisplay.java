@@ -7,9 +7,9 @@ import java.util.Collection;
 public interface IChatDisplay {
     void sendStartMessage(Player player);
     void sendStopMessage(Player player);
+    void sendEventCurrentlyRunning(Player player);
 
     void sendStartMessage(Collection<Player> players);
     void sendStopMessage(Collection<Player> players);
-
-    void sendCurrentlyActiveMessage(Player player);
+    void sendEventCurrentlyRunning(Collection<Player> players);
 }

@@ -106,7 +106,6 @@ public class ActiveWorldEvent {
     }
 
     public void addViewer(Player viewer) {
-        if (viewer == null || !viewer.isOnline()) return;
         if (viewers.add(viewer.getUniqueId())) {
             if (bossBarDisplay != null) {
                 bossBarDisplay.addViewer(viewer);
@@ -115,7 +114,6 @@ public class ActiveWorldEvent {
     }
 
     public void removeViewer(Player viewer) {
-        if (viewer == null || !viewer.isOnline()) return;
         if (viewers.remove(viewer.getUniqueId())) {
             if (bossBarDisplay != null) {
                 bossBarDisplay.removeViewer(viewer);
@@ -144,10 +142,6 @@ public class ActiveWorldEvent {
 
     public World getRuntimeWorld() {
         return runtimeWorld;
-    }
-
-    public int getViewerCount() {
-        return viewers.size();
     }
 
     @Override

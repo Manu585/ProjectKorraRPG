@@ -29,14 +29,27 @@ public class SoundDisplay implements ISoundDisplay {
     }
 
     @Override
+    public void playStartSound(Player player) {
+        if (player == null || !player.isOnline() || start == null) return;
+        player.playSound(player.getLocation(), start, SoundCategory.AMBIENT, startVolume, startPitch);
+
+    }
+
+    @Override
+    public void playStopSound(Player player) {
+        if (player == null || !player.isOnline() || stop == null) return;
+        player.playSound(player.getLocation(), stop, SoundCategory.AMBIENT, stopVolume, stopPitch);
+    }
+
+    @Override
     public void playStartSound(Collection<Player> players) {
-        if (players == null || players.isEmpty() || start == null) return;
-        players.forEach(player -> player.playSound(player.getLocation(), start, SoundCategory.AMBIENT, startVolume, startPitch));
+        if (players == null || players.isEmpty()) return;
+        players.forEach(this::playStartSound);
     }
 
     @Override
     public void playStopSound(Collection<Player> players) {
-        if (players == null || players.isEmpty() || stop == null) return;
-        players.forEach(player -> player.playSound(player.getLocation(), stop, SoundCategory.AMBIENT, stopVolume, stopPitch));
+        if (players == null || players.isEmpty()) return;
+        players.forEach(this::playStopSound);
     }
 }

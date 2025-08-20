@@ -86,6 +86,7 @@ public class WorldEventService {
         }
 
         active.stop();
+        recalcAllAbilities();
         recalcAllPassives();
         tryStopTicker();
 
