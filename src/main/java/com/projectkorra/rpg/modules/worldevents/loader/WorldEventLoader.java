@@ -113,10 +113,24 @@ public class WorldEventLoader {
         String startMsg = config.getString("DisplayMethods.Chat.EventStartMessage");
         String stopMsg = config.getString("DisplayMethods.Chat.EventStopMessage");
         String runningMsg = config.getString("DisplayMethods.Chat.EventCurrentlyRunning");
-        if (startMsg == null || startMsg.isBlank() || stopMsg == null || stopMsg.isBlank() || runningMsg == null || runningMsg.isBlank()) {
-            plugin.getLogger().warning("Chat enabled but start / stop / running message missing. Skipping Chat display!");
+
+        List<String> missing = new ArrayList<>();
+        if (startMsg == null) {
+            missing.add("DisplayMethods.Chat.EventStartMessage");
+        }
+        if (stopMsg == null) {
+            missing.add("DisplayMethods.Chat.EventStopMessage");
+        }
+        if (runningMsg == null) {
+            missing.add("DisplayMethods.Chat.EventCurrentlyRunning");
+        }
+
+        if (!missing.isEmpty()) {
+            plugin.getLogger().warning("Chat display enabled but these entries are missing/blank:");
+            missing.forEach(name -> plugin.getLogger().warning(" - " + name));
             return null;
         }
+
         return new ChatDisplay(startMsg, stopMsg, runningMsg);
     }
 
