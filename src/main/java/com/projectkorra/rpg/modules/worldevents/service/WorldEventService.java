@@ -90,7 +90,6 @@ public class WorldEventService {
 
         active.stop();
         recalcAllAbilities();
-        recalcAllPassives();
         tryStopTicker();
 
         Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(worldEvent));
@@ -119,14 +118,6 @@ public class WorldEventService {
         for (CoreAbility ability : CoreAbility.getAbilitiesByInstances()) {
             ability.recalculateAttributes();
         }
-    }
-
-    private void recalcAllPassives() {
-        PassiveManager.getPassives().values().forEach(passive -> {
-            for (CoreAbility ability : CoreAbility.getAbilities(passive.getClass())) {
-                ability.recalculateAttributes();
-            }
-        });
     }
 
     public void addViewer(WorldEvent worldEvent, Player viewer) {
