@@ -42,7 +42,7 @@ public class WorldEventModule extends Module {
 
 		// Create Listeners
 		this.modificationListener = new WorldEventModificationListener(new WorldEventModificationService(this.activeWorldEventIndex));
-        this.handleWorldEventDisplayListener = new HandleWorldEventDisplayListener(this.getPlugin(), this.worldEventService);
+        this.handleWorldEventDisplayListener = new HandleWorldEventDisplayListener(this.worldEventService);
 
         // Register Listeners
 		registerListeners(

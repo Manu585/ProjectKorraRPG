@@ -14,7 +14,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WorldEventService {
     private final ProjectKorraRPG plugin;
@@ -127,13 +130,30 @@ public class WorldEventService {
     }
 
     public void addViewer(WorldEvent worldEvent, Player viewer) {
+        if (worldEvent == null) return;
         ActiveWorldEvent active = activeEventsIndex.getActive(worldEvent);
-        if (active != null) active.addViewer(viewer);
+
+        if (active != null) {
+            active.addViewer(viewer);
+        }
     }
 
     public void removeViewer(WorldEvent worldEvent, Player viewer) {
+        if (worldEvent == null) return;
         ActiveWorldEvent active = activeEventsIndex.getActive(worldEvent);
-        if (active != null) active.removeViewer(viewer);
+
+        if (active != null) {
+            active.removeViewer(viewer);
+        }
+    }
+
+    public void sendWorldEventRunningMessage(WorldEvent worldEvent, Player player) {
+        if (worldEvent == null) return;
+        ActiveWorldEvent active = activeEventsIndex.getActive(worldEvent);
+
+        if (active != null) {
+            active.sendWorldEventRunningMessage(player);
+        }
     }
 
     private void scheduleNonTickingStop(WorldEvent worldEvent) {

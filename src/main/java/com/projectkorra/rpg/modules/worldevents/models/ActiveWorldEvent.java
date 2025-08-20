@@ -6,7 +6,9 @@ import com.projectkorra.rpg.modules.worldevents.display.ISoundDisplay;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class ActiveWorldEvent {
     private final WorldEvent worldEvent;
@@ -118,6 +120,12 @@ public class ActiveWorldEvent {
             if (bossBarDisplay != null) {
                 bossBarDisplay.removeViewer(viewer);
             }
+        }
+    }
+
+    public void sendWorldEventRunningMessage(Player player) {
+        if (chatDisplay != null) {
+            chatDisplay.sendEventCurrentlyRunning(player);
         }
     }
 
