@@ -126,7 +126,7 @@ public class WorldEventLoader {
         }
 
         if (!missing.isEmpty()) {
-            plugin.getLogger().warning("Chat display enabled but these entries are missing/blank:");
+            plugin.getLogger().warning("Chat display enabled but following entries are missing/blank:");
             missing.forEach(name -> plugin.getLogger().warning(" - " + name));
             return null;
         }
@@ -140,8 +140,18 @@ public class WorldEventLoader {
 
         String colorRaw = config.getString("DisplayMethods.BossBar.Color");
         String styleRaw = config.getString("DisplayMethods.BossBar.Style");
-        if (colorRaw == null || colorRaw.isBlank() || styleRaw == null || styleRaw.isBlank()) {
-            plugin.getLogger().warning("BossBar enabled but Color / Style missing. Skipping BossBar Display!");
+
+        List<String> missing = new ArrayList<>();
+        if (colorRaw == null || colorRaw.isBlank()) {
+            missing.add("DisplayMethods.BossBar.Color");
+        }
+        if (styleRaw == null || styleRaw.isBlank()) {
+            missing.add("DisplayMethods.BossBar.Style");
+        }
+
+        if (!missing.isEmpty()) {
+            plugin.getLogger().warning("BossBar display enabled but following entries are missing/blank:");
+            missing.forEach(name -> plugin.getLogger().warning(" - " + name));
             return null;
         }
 
