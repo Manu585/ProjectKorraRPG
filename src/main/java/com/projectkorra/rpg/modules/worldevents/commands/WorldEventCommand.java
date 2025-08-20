@@ -1,10 +1,12 @@
 package com.projectkorra.rpg.modules.worldevents.commands;
 
 import com.projectkorra.rpg.commands.RPGCommand;
+import com.projectkorra.rpg.modules.worldevents.gui.WorldEventAttributionGui;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.service.WorldEventService;
 import com.projectkorra.rpg.modules.worldevents.storage.ActiveWorldEventIndex;
 import com.projectkorra.rpg.modules.worldevents.storage.WorldEventRegistry;
+import com.projectkorra.rpg.util.ChatUtil;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -47,11 +49,11 @@ public class WorldEventCommand extends RPGCommand {
                 final String idPath = args.get(1);
                 final WorldEvent worldEvent = registry.findByPath(idPath).orElse(null);
                 if (worldEvent == null) {
-                    sender.sendMessage("WorldEvent " + idPath + " not found!");
+                    ChatUtil.sendBrandingMessage(sender, "&cWorldEvent '" + idPath + "' not found.");
                     return;
                 }
                 if (activeEventsIndex.activeWorldEvents().contains(worldEvent)) {
-                    sender.sendMessage("WorldEvent " + idPath + " is already active!");
+                    ChatUtil.sendBrandingMessage(sender, "&cWorldEvent '" + idPath + "' is already active!");
                     return;
                 }
 
@@ -65,9 +67,9 @@ public class WorldEventCommand extends RPGCommand {
                 }
 
                 if (started) {
-                    sender.sendMessage("Started WorldEvent '" + worldEvent.getKey().getKey() + "'.");
+                    ChatUtil.sendBrandingMessage(sender, "&aStarted WorldEvent '" + worldEvent.getKey().getKey() + "'.");
                 } else {
-                    sender.sendMessage("Could not start WorldEvent '" + idPath + "'. Check logs for details.");
+                    ChatUtil.sendBrandingMessage(sender, "&cCould not start WorldEvent '" + idPath + "'. Check logs for details.");
                 }
             }
 
@@ -75,11 +77,11 @@ public class WorldEventCommand extends RPGCommand {
                 // STOP ALL
                 if (args.size() == 1) {
                     if (activeEventsIndex.activeWorldEvents().isEmpty()) {
-                        sender.sendMessage("No active WorldEvents to stop.");
+                        ChatUtil.sendBrandingMessage(sender, "&cNo active WorldEvents to stop.");
                         return;
                     }
                     service.stopAll();
-                    sender.sendMessage("Stopped all active WorldEvents.");
+                    ChatUtil.sendBrandingMessage(sender, "&aStopped all active WorldEvents.");
                     return;
                 }
 
@@ -88,20 +90,42 @@ public class WorldEventCommand extends RPGCommand {
                     final String idPath = args.get(1);
                     final WorldEvent we = registry.findByPath(idPath).orElse(null);
                     if (we == null) {
-                        sender.sendMessage("WorldEvent '" + idPath + "' not found.");
+                        ChatUtil.sendBrandingMessage(sender, "&cWorldEvent '" + idPath + "' not found.");
                         return;
                     }
                     if (!activeEventsIndex.activeWorldEvents().contains(we)) {
-                        sender.sendMessage("WorldEvent '" + idPath + "' is not active.");
+                        ChatUtil.sendBrandingMessage(sender, "&cWorldEvent '" + idPath + "' is not active.");
                         return;
                     }
                     if (service.stop(we)) {
-                        sender.sendMessage("Stopped world event '" + we.getKey().getKey() + "'.");
+                        ChatUtil.sendBrandingMessage(sender, "&aStopped world event '" + we.getKey().getKey() + "'.");
                     } else {
-                        sender.sendMessage("Could not stop world event '" + idPath + "'. Check logs for details.");
+                        ChatUtil.sendBrandingMessage(sender, "&cCould not stop world event '" + idPath + "'. Check logs for details.");
                     }
                 } else {
                     help(sender, false);
+                }
+            }
+
+            case "edit" -> {
+                if (args.size() == 1) {
+                    ChatUtil.sendBrandingMessage(sender, "&cSpecify WorldEvent to edit!");
+                    return;
+                }
+
+                if (args.size() == 2) {
+                    final String idPath = args.get(1);
+                    final WorldEvent worldEvent = registry.findByPath(idPath).orElse(null);
+                    if (worldEvent == null) {
+                        ChatUtil.sendBrandingMessage(sender, "&cWorldEvent '" + idPath + "' not found.");
+                        return;
+                    }
+                    if (!isPlayer(sender)) {
+                        ChatUtil.sendBrandingMessage(sender, "&cOnly players can edit WorldEvents in game. Console has to do via. configuration files.");
+                        return;
+                    }
+
+                    new WorldEventAttributionGui().open((Player) sender);
                 }
             }
 
@@ -112,35 +136,39 @@ public class WorldEventCommand extends RPGCommand {
     @Override
     protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
         if (args.isEmpty()) {
-            return List.of("start", "stop");
+            return List.of("start", "stop", "edit");
         }
 
         if (args.size() == 1) {
             final String first = args.getFirst().toLowerCase(Locale.ROOT);
             final String partialId = (args.size() > 1 ? args.get(1) : "").toLowerCase(Locale.ROOT);
 
-            if ("start".equals(first)) {
-                // Inactive events only
-                final Set<WorldEvent> active = activeEventsIndex.activeWorldEvents();
-                return registry.getAll().entrySet().stream().parallel()
-                        .filter(e -> !active.contains(e.getValue()))
-                        .map(e -> e.getKey().getKey())
-                        .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
-                        .sorted(String.CASE_INSENSITIVE_ORDER)
-                        .collect(Collectors.toList());
-            }
+            switch (first) {
+                case "start", "edit" -> {
+                    return getAllWorldEvents(partialId);
+                }
 
-            if ("stop".equals(first)) {
-                // Active events only
-                return activeEventsIndex.activeWorldEvents().stream().parallel()
-                        .map(WorldEvent::getKey)
-                        .map(NamespacedKey::getKey)
-                        .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
-                        .sorted(String.CASE_INSENSITIVE_ORDER)
-                        .collect(Collectors.toList());
+                case "stop" -> {
+                    return activeEventsIndex.activeWorldEvents().stream().parallel()
+                            .map(WorldEvent::getKey)
+                            .map(NamespacedKey::getKey)
+                            .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
+                            .sorted(String.CASE_INSENSITIVE_ORDER)
+                            .collect(Collectors.toList());
+                }
             }
         }
 
         return Collections.emptyList();
+    }
+
+    private List<String> getAllWorldEvents(String partialId) {
+        final Set<WorldEvent> active = activeEventsIndex.activeWorldEvents();
+        return registry.getAll().entrySet().stream().parallel()
+                .filter(e -> !active.contains(e.getValue()))
+                .map(e -> e.getKey().getKey())
+                .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .collect(Collectors.toList());
     }
 }
