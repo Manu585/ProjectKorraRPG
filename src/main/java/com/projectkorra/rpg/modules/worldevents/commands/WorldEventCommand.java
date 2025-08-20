@@ -12,11 +12,9 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WorldEventCommand extends RPGCommand {
     private final WorldEventService service;
@@ -144,8 +142,12 @@ public class WorldEventCommand extends RPGCommand {
             final String partialId = (args.size() > 1 ? args.get(1) : "").toLowerCase(Locale.ROOT);
 
             switch (first) {
-                case "start", "edit" -> {
-                    return getAllWorldEvents(partialId);
+                case "start" -> {
+                    return getAllWorldEvents(partialId, true);
+                }
+
+                case "edit" -> {
+                    return  getAllWorldEvents(partialId, false);
                 }
 
                 case "stop" -> {
@@ -162,11 +164,16 @@ public class WorldEventCommand extends RPGCommand {
         return Collections.emptyList();
     }
 
-    private List<String> getAllWorldEvents(String partialId) {
-        final Set<WorldEvent> active = activeEventsIndex.activeWorldEvents();
-        return registry.getAll().entrySet().stream().parallel()
-                .filter(e -> !active.contains(e.getValue()))
-                .map(e -> e.getKey().getKey())
+    private List<String> getAllWorldEvents(String partialId, boolean filterActive) {
+        final Set<WorldEvent> active = filterActive ? new HashSet<>(activeEventsIndex.activeWorldEvents()) : Collections.emptySet();
+
+        Stream<Map.Entry<NamespacedKey, WorldEvent>> stream = registry.getAll().entrySet().stream();
+
+        if (filterActive) {
+            stream = stream.filter(e -> !active.contains(e.getValue()));
+        }
+
+        return stream.map(e -> e.getKey().getKey())
                 .filter(id -> id.toLowerCase(Locale.ROOT).startsWith(partialId))
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .collect(Collectors.toList());
