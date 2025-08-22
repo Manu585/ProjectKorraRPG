@@ -77,7 +77,7 @@ public class ActiveWorldEvent {
     }
 
     /**
-     * @return true if expired and should be stopped by Manager
+     * @return true if expired and should be stopped by Service
      */
     public boolean tick(long tickNo, long nowMillis) {
         // Ticking not required?

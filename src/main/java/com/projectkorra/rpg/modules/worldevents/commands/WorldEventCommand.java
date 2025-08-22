@@ -123,7 +123,7 @@ public class WorldEventCommand extends RPGCommand {
                         return;
                     }
 
-                    new WorldEventAttributionGui().open((Player) sender);
+                    new WorldEventAttributionGui(worldEvent).open((Player) sender);
                 }
             }
 

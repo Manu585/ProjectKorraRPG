@@ -25,7 +25,6 @@ public class AssignmentListener implements Listener {
             BendingPlayer bPlayer = (BendingPlayer) event.getBendingPlayer();
             if (bPlayer.getElements().isEmpty() && !bPlayer.isPermaRemoved()) {
                 assignmentManager.assignRandomGroup(bPlayer, false);
-                bPlayer.saveElements();
             }
         }
     }
@@ -34,7 +33,6 @@ public class AssignmentListener implements Listener {
     public void onBendingPlayerDeath(final PlayerDeathEvent event) {
         if (!avatarManager.isCurrentRPGAvatar(event.getEntity().getUniqueId())) {
             assignmentManager.assignRandomGroup(BendingPlayer.getBendingPlayer(event.getEntity()), true);
-            BendingPlayer.getBendingPlayer(event.getEntity()).saveElements();
         }
     }
 }

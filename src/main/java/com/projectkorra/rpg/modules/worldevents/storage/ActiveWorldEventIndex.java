@@ -93,12 +93,4 @@ public class ActiveWorldEventIndex {
         // Fresh array! :D
         snapshot = activeWorldEventMap.values().toArray(new ActiveWorldEvent[0]);
     }
-
-    public Map<UUID, Set<WorldEvent>> debugActiveByWorld() {
-        Map<UUID, Set<WorldEvent>> copy = new HashMap<>();
-        for (Map.Entry<UUID, Set<WorldEvent>> e : activeWorldEventsByWorld.entrySet()) {
-            copy.put(e.getKey(), Set.copyOf(e.getValue()));
-        }
-        return Collections.unmodifiableMap(copy);
-    }
 }

@@ -1,7 +1,6 @@
 package com.projectkorra.rpg.modules.worldevents.service;
 
 import com.projectkorra.projectkorra.ability.CoreAbility;
-import com.projectkorra.projectkorra.ability.util.PassiveManager;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStartEvent;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
@@ -49,7 +48,6 @@ public class WorldEventService {
 
         activeEventsIndex.add(worldEvent, active);
         active.start();
-        ensureTicker();
 
         if (active.requiresTicking()) {
             ensureTicker(); // TaskTimer because of BossBar
@@ -161,7 +159,6 @@ public class WorldEventService {
 
     private void ensureTicker() {
         if (ticker != null) return;
-        if (!activeEventsIndex.hasTicking()) return;
 
         tickNo = 0;
         ticker = new BukkitRunnable() {

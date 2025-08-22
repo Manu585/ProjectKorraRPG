@@ -22,10 +22,9 @@ public final class ScheduleParser {
         int minute = m.group(2) != null ? Integer.parseInt(m.group(2)) : 0;
         String period = m.group(3);
 
-        if (period != null) {
-            if ("pm".equals(period) && hour < 12) hour += 12;
-            if ("am".equals(period) && hour == 12) hour = 0;
-        }
+        if ("pm".equals(period) && hour < 12) hour += 12;
+        if ("am".equals(period) && hour == 12) hour = 0;
+
         if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return fallback;
 
         return LocalTime.of(hour, minute);

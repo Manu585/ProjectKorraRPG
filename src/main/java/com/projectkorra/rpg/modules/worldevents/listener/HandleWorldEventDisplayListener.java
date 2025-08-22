@@ -14,7 +14,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import java.util.ArrayList;
 
 /**
- * Handle players switching worlds to remove <br>
+ * Handle players switching worlds to remove
  * player BossBar and generally from a {@link WorldEvent}
  */
 public class HandleWorldEventDisplayListener implements Listener {
