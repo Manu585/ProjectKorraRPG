@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Locale;
 
 import static com.projectkorra.rpg.ProjectKorraRPG.luckPermsAPI;
@@ -54,16 +55,12 @@ public class RPGMethods {
             return BarColor.RED;
         }
 
-        return switch (colorStr.toUpperCase()) {
-            case "GREEN"  -> BarColor.GREEN;
-            case "BLUE"   -> BarColor.BLUE;
-            case "YELLOW" -> BarColor.YELLOW;
-            case "PURPLE" -> BarColor.PURPLE;
-            case "WHITE"  -> BarColor.WHITE;
-            case "PINK"   -> BarColor.PINK;
-
-            default -> BarColor.RED;
-        };
+        try {
+            return BarColor.valueOf(colorStr.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            ProjectKorraRPG.getPlugin().getLogger().warning("Failed BarColor conversion for String: '" + colorStr + "'! Possible values: " + Arrays.toString(BarColor.values()));
+            return null;
+        }
     }
 
     public static BarStyle convertStringToBarStyle(String styleStr) {
@@ -71,14 +68,12 @@ public class RPGMethods {
             return BarStyle.SOLID;
         }
 
-        return switch (styleStr.toUpperCase()) {
-            case "SEGMENTED_6"  -> BarStyle.SEGMENTED_6;
-            case "SEGMENTED_10" -> BarStyle.SEGMENTED_10;
-            case "SEGMENTED_12" -> BarStyle.SEGMENTED_12;
-            case "SEGMENTED_20" -> BarStyle.SEGMENTED_20;
-
-            default -> BarStyle.SOLID;
-        };
+        try {
+            return BarStyle.valueOf(styleStr.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            ProjectKorraRPG.getPlugin().getLogger().warning("Failed BarColor conversion for String: '" + styleStr + "'! Possible values: " + Arrays.toString(BarStyle.values()));
+            return null;
+        }
     }
 
     public static @Nullable Sound resolveSound(String raw) {

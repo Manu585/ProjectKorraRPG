@@ -4,8 +4,6 @@ import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import org.bukkit.event.Listener;
 
-import java.util.Arrays;
-
 public abstract class Module {
     private final ProjectKorraRPG plugin;
     private final String name;
@@ -20,7 +18,9 @@ public abstract class Module {
     public abstract void disable();
 
     public void registerListeners(Listener... l) {
-        Arrays.stream(l).parallel().forEach(listener -> this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin));
+        for (Listener listener : l) {
+            this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin);
+        }
     }
 
     public ProjectKorraRPG getPlugin() {

@@ -238,16 +238,10 @@ public class ConfigManager {
         } else if (type == WORLDEVENTS) {
             config = sozinsCometConfig.get();
 
-            List<String> disabledWorlds = new ArrayList<>();
-            disabledWorlds.add("none");
-
-            List<String> scheduledWorlds = new ArrayList<>();
-            scheduledWorlds.add("world");
-
-            config.addDefault("Title", "&cSozins Comet");
+            config.addDefault("Title", "&cSozin's Comet");
             config.addDefault("Duration", 5000);
 
-            config.addDefault("Worlds", scheduledWorlds);
+            config.addDefault("Worlds", List.of("world"));
 
             config.addDefault("Schedule.At", "7am");
             config.addDefault("Schedule.Repeat", "7d");
@@ -261,9 +255,9 @@ public class ConfigManager {
             config.addDefault("DisplayMethods.BossBar.Style", "SOLID");
             config.addDefault("DisplayMethods.BossBar.Smooth", true);
             config.addDefault("DisplayMethods.Chat.Enabled", true);
-            config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Fire benders bending has been extremely heightened!");
-            config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozins Comet has left the world's atmosphere. Fire benders bending has been normalized!");
-            config.addDefault("DisplayMethods.Chat.EventCurrentlyRunning", "&cSozins Comet is currently in the world's atmosphere. Fire benders bending is extremely heightened!");
+            config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozin's Comet has entered the world's atmosphere. Fire benders bending has been extremely heightened!");
+            config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozin's Comet has left the world's atmosphere. Fire benders bending has been normalized!");
+            config.addDefault("DisplayMethods.Chat.EventCurrentlyRunning", "&cSozin's Comet is currently in the world's atmosphere. Fire benders bending is extremely heightened!");
             config.addDefault("DisplayMethods.Scoreboard.Enabled", false);
             config.addDefault("PlayEventStartSound", true);
             config.addDefault("EventStart.Sound", "entity.ender_dragon.growl");
@@ -273,7 +267,7 @@ public class ConfigManager {
             config.addDefault("EventStop.Sound", "entity.ender_dragon.growl");
             config.addDefault("EventStop.Volume", 1);
             config.addDefault("EventStop.Pitch", 0.5);
-            config.addDefault("DisabledWorlds", disabledWorlds);
+            config.addDefault("DisabledWorlds", List.of("none"));
             config.addDefault("Abilities.Fire._All.Damage", "x2.0");
             config.addDefault("Abilities.Fire._All.Speed", "x2.0");
             config.addDefault("Abilities.Fire._All.Cooldown", "x0.5");

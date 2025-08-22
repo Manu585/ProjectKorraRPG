@@ -18,7 +18,7 @@ public class MainMenu implements Menu {
 
         return InventoryUIBuilder.create(ROWS, "&1Main Menu")
                 .fillLeftRight(vines, filler)
-                .withButton(3, 1, ItemUtil.create(Material.NETHER_STAR, "&1SkillTree"), click -> new SkillTreeMenu().open(player))
+                .withButton(3, 1, ItemUtil.create(Material.NETHER_STAR, "&1Skill Tree"), click -> new SkillTreeMenu().open(player))
                 .build();
     }
 }

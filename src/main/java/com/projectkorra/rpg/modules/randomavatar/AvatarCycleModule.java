@@ -30,10 +30,7 @@ public class AvatarCycleModule extends Module {
 
         avatarManager.refreshRecentPlayersAsync();
 
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(ProjectKorraRPG.getPlugin(), () -> {
-            ProjectKorraRPG.getPlugin().getLogger().info("Avatar selection: Checking for new avatars.");
-            avatarManager.checkAvatars();
-        }, 0L, 20L * 30); // Every 30s (For Testing)
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(ProjectKorraRPG.getPlugin(), () -> avatarManager.checkAvatars(), 0L, 20L * 30); // Every 30s (For Testing)
     }
 
     @Override
