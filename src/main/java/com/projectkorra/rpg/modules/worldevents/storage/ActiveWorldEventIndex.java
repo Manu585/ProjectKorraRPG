@@ -90,7 +90,8 @@ public class ActiveWorldEventIndex {
     }
 
     private void rebuildSnapshot() {
-        // Fresh array! :D
-        snapshot = activeWorldEventMap.values().toArray(new ActiveWorldEvent[0]);
+        Collection<ActiveWorldEvent> values = activeWorldEventMap.values();
+        ActiveWorldEvent[] array = new ActiveWorldEvent[values.size()];
+        snapshot = values.toArray(array);
     }
 }
