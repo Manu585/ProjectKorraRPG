@@ -22,7 +22,10 @@ public class WorldEventService {
     private final ProjectKorraRPG plugin;
     private final ActiveWorldEventIndex activeEventsIndex;
 
+    // For non ticking events (No BossBar usage)
     private final Map<WorldEvent, BukkitTask> nonTickingStops = new HashMap<>();
+
+    // Global ticker so the BossBar for each ActiveWorldEvent receives a tick update
     private BukkitTask ticker;
     private long tickNo;
 
@@ -33,6 +36,7 @@ public class WorldEventService {
 
     public boolean start(WorldEvent worldEvent, World runtimeWorld) {
         if (worldEvent == null || runtimeWorld == null) return false;
+
         if (activeEventsIndex.contains(worldEvent)) {
             plugin.getLogger().warning("WorldEvent already running: " + worldEvent.getKey());
             return false;
@@ -44,10 +48,14 @@ public class WorldEventService {
 
         ActiveWorldEvent active = new ActiveWorldEvent(worldEvent, runtimeWorld);
 
-        recalcAllAbilities();
-
+        // Publish to index
         activeEventsIndex.add(worldEvent, active);
+
+        // Start displays / Set start time for ticker
         active.start();
+
+        // Recalc ability attributes
+        recalcAllAbilities();
 
         if (active.requiresTicking()) {
             ensureTicker(); // TaskTimer because of BossBar
@@ -68,7 +76,6 @@ public class WorldEventService {
         if (worldEvent != null && !worldEvent.getScheduledWorlds().isEmpty()) {
             runtimeWorld = worldEvent.getScheduledWorlds().getFirst();
         }
-
         if (runtimeWorld == null && !plugin.getServer().getWorlds().isEmpty()) {
             runtimeWorld = plugin.getServer().getWorlds().getFirst();
         }
@@ -86,17 +93,23 @@ public class WorldEventService {
             return false;
         }
 
+        // Stop displays / clear viewers
         active.stop();
-        recalcAllAbilities();
+
+        // Stop ticker
         tryStopTicker();
+
+        // Recalc ability attributes
+        recalcAllAbilities();
 
         Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(worldEvent));
         return true;
     }
 
     public void stopAll() {
-        for (BukkitTask task : nonTickingStops.values()) task.cancel();
-
+        for (BukkitTask task : nonTickingStops.values()) {
+            task.cancel();
+        }
         nonTickingStops.clear();
 
         for (WorldEvent worldEvent : new ArrayList<>(activeEventsIndex.activeWorldEvents())) {
@@ -158,7 +171,7 @@ public class WorldEventService {
     }
 
     private void ensureTicker() {
-        if (ticker != null) return;
+        if (ticker != null || !activeEventsIndex.hasTicking()) return;
 
         tickNo = 0;
         ticker = new BukkitRunnable() {

@@ -53,7 +53,7 @@ public class ActiveWorldEventIndex {
                 list.add(active);
             }
         }
-        return list.toArray(new ActiveWorldEvent[0]);
+        return list.toArray(ActiveWorldEvent[]::new);
     }
 
     public void clearAll() {
