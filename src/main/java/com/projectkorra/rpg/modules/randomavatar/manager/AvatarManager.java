@@ -92,7 +92,8 @@ public class AvatarManager {
 
     private void grantTempElements(OfflinePlayer p, Instant startTime) {
         long remaining = avatarDuration.toMillis() - Duration.between(startTime, Instant.now()).toMillis();
-        BendingPlayer bp = BendingPlayer.getBendingPlayer(p);
+        OfflineBendingPlayer bp = new OfflineBendingPlayer(p);
+
         avatarElements.stream()
                 .filter(el -> !bp.hasElement(el) && !bp.hasTempElement(el))
                 .forEach(el -> Bukkit.getScheduler().runTaskLater(plugin,
