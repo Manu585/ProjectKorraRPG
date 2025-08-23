@@ -1,7 +1,6 @@
-package com.projectkorra.rpg.modules.worldevents.display.bossbar;
+package com.projectkorra.rpg.modules.worldevents.display;
 
 import com.projectkorra.projectkorra.util.ChatUtil;
-import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;

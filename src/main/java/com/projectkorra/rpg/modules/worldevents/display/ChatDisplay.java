@@ -1,6 +1,5 @@
-package com.projectkorra.rpg.modules.worldevents.display.chat;
+package com.projectkorra.rpg.modules.worldevents.display;
 
-import com.projectkorra.rpg.modules.worldevents.display.IChatDisplay;
 import com.projectkorra.rpg.util.ChatUtil;
 import org.bukkit.entity.Player;
 
@@ -14,7 +13,7 @@ import java.util.Collection;
  * - EventRunning - Event currently active message <br>
  * <br>
  * EventRunning is for players joining / re-joining the server <br>
- * so they will know that an event is currently running (given {@link com.projectkorra.rpg.modules.worldevents.display.bossbar.BossBarDisplay} not active)
+ * so they will know that an event is currently running (given {@link BossBarDisplay} not active)
  */
 public class ChatDisplay implements IChatDisplay {
 	private final String startMessage;

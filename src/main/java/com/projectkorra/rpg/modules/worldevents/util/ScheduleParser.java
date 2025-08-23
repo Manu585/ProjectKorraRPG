@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.worldevents.schedule.util;
+package com.projectkorra.rpg.modules.worldevents.util;
 
 import java.time.Duration;
 import java.time.LocalTime;

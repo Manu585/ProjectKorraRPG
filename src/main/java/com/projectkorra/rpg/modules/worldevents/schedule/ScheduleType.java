@@ -1,7 +1,7 @@
 package com.projectkorra.rpg.modules.worldevents.schedule;
 
 /**
- * TEMP CLASS
+ * TEMP CLASS, package will be filled with future schedule update
  */
 public enum ScheduleType {
     IN_GAME_DAYS,

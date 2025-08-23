@@ -1,6 +1,5 @@
-package com.projectkorra.rpg.modules.worldevents.display.sound;
+package com.projectkorra.rpg.modules.worldevents.display;
 
-import com.projectkorra.rpg.modules.worldevents.display.ISoundDisplay;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;

@@ -5,7 +5,7 @@ import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
 import com.projectkorra.rpg.modules.worldevents.listener.HandleWorldEventDisplayListener;
 import com.projectkorra.rpg.modules.worldevents.listener.WorldEventModificationListener;
-import com.projectkorra.rpg.modules.worldevents.loader.WorldEventLoader;
+import com.projectkorra.rpg.modules.worldevents.factory.WorldEventLoader;
 import com.projectkorra.rpg.modules.worldevents.service.WorldEventModificationService;
 import com.projectkorra.rpg.modules.worldevents.service.WorldEventService;
 import com.projectkorra.rpg.modules.worldevents.storage.ActiveWorldEventIndex;

@@ -110,7 +110,6 @@ public final class WorldEvent implements Keyed {
 
     @Override
     public String toString() {
-        // AI did this, not going to overlook just for debugging purposes
         String scheduled = scheduledWorlds.isEmpty()
                 ? "[]"
                 : scheduledWorlds.stream()

@@ -159,7 +159,7 @@ public class WorldEventService {
     }
 
     private void scheduleNonTickingStop(WorldEvent worldEvent) {
-        long delayTicks = Math.max(1L, worldEvent.getDuration() / 50L);
+        long delayTicks = Math.max(1L, worldEvent.getDuration() / 50L); // Convert milliseconds to ticks
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {

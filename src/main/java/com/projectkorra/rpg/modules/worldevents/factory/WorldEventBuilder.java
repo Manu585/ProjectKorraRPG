@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.worldevents.builder;
+package com.projectkorra.rpg.modules.worldevents.factory;
 
 import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.display.IChatDisplay;
