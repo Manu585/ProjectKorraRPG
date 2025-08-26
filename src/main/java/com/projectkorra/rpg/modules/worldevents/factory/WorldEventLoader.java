@@ -2,12 +2,7 @@ package com.projectkorra.rpg.modules.worldevents.factory;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
-import com.projectkorra.rpg.modules.worldevents.display.IBossBarDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.IChatDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.ISoundDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.BossBarDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.ChatDisplay;
-import com.projectkorra.rpg.modules.worldevents.display.SoundDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.*;
 import com.projectkorra.rpg.modules.worldevents.models.AttributeRules;
 import com.projectkorra.rpg.modules.worldevents.models.ScheduleSpecifications;
 import com.projectkorra.rpg.modules.worldevents.models.WorldEvent;

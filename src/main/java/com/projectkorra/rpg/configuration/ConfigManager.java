@@ -6,7 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ConfigManager {
     private static final ConfigType DEFAULT = new ConfigType("Default");

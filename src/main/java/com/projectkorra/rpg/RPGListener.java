@@ -1,6 +1,7 @@
 package com.projectkorra.rpg;
 
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
+import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
 import com.projectkorra.rpg.configuration.ConfigManager;
@@ -11,12 +12,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class RPGListener implements Listener {
 	private final ProjectKorraRPG plugin;
 
-	public RPGListener(ProjectKorraRPG plugin) {
+	public RPGListener(final ProjectKorraRPG plugin) {
 		this.plugin = plugin;
 	}
 
 	@EventHandler
-	public void onBendingConfigReload(BendingReloadEvent event) {
+	public void onBendingConfigReload(final BendingReloadEvent event) {
 		// Disable all enabled modules for clean module start
 		plugin.getModuleManager().disableModules();
 
@@ -30,7 +31,8 @@ public class RPGListener implements Listener {
 			public void run() {
 				new RPGCommandBase();
 				new HelpCommand();
-			}
+                event.getSender().sendMessage(ChatUtil.color("&bRPG Addon reloaded!"));
+            }
 		}.runTaskLater(plugin, 20);
 
 		// Re-Enable all modules for clean start

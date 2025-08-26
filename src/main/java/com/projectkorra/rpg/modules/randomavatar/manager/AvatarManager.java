@@ -3,7 +3,6 @@
  */
 package com.projectkorra.rpg.modules.randomavatar.manager;
 
-import com.google.common.collect.Table;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.OfflineBendingPlayer;

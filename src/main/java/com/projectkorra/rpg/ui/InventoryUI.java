@@ -7,12 +7,12 @@ import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
 public interface InventoryUI extends InventoryHolder {
-    void open(@NotNull Player player);
+    void open(final @NotNull Player player);
 
-    default void handleClick(InventoryClickEvent event) {}
+    default void handleClick(final InventoryClickEvent event) {}
 
     // Close callback
-    default void onClose(@NotNull Player player) {}
+    default void onClose(final @NotNull Player player) {}
 
     @Override @NotNull Inventory getInventory();
 }

@@ -24,7 +24,7 @@ public class RPGMethods {
 	 * @Description This method is a simplified way of removing
 	 * Permissions to players via LuckPerms
 	 */
-	public static void removePermission(Player player, String permission) {
+	public static void removePermission(final Player player, final String permission) {
 		if (luckPermsAPI == null)
 			return;
 
@@ -41,7 +41,7 @@ public class RPGMethods {
 	 * @Description This method is a simplified way of adding
 	 * Permissions to players via LuckPerms
 	 */
-	public static void addPermission(Player player, String permission) {
+	public static void addPermission(final Player player, final String permission) {
 		if (luckPermsAPI == null)
 			return;
 
@@ -50,7 +50,7 @@ public class RPGMethods {
 		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
 	}
 
-    public static BarColor convertStringToBarColor(String colorStr) {
+    public static BarColor convertStringToBarColor(final String colorStr) {
         if (colorStr == null) {
             return BarColor.RED;
         }
@@ -63,7 +63,7 @@ public class RPGMethods {
         }
     }
 
-    public static BarStyle convertStringToBarStyle(String styleStr) {
+    public static BarStyle convertStringToBarStyle(final String styleStr) {
         if (styleStr == null) {
             return BarStyle.SOLID;
         }
@@ -76,7 +76,7 @@ public class RPGMethods {
         }
     }
 
-    public static @Nullable Sound resolveSound(String raw) {
+    public static @Nullable Sound resolveSound(final String raw) {
         if (raw == null) return null;
         String soundId = raw.trim().toLowerCase(Locale.ROOT);
         if (soundId.isEmpty()) return null;
@@ -92,7 +92,7 @@ public class RPGMethods {
 	 * @author CrashCringle
 	 * @Description This method converts a period string like 3d4h to a duration object
 	 */
-	public static Duration periodStringToDuration(String period) {
+	public static Duration periodStringToDuration(final String period) {
 		// Can be in the formats like: 1s, 1m, 1h, 1d, 2d1h10s etc etc.
 		Duration duration = Duration.ZERO;
 		if (period == null || period.isEmpty()) {
