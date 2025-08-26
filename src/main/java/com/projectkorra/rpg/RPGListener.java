@@ -31,11 +31,12 @@ public class RPGListener implements Listener {
 			public void run() {
 				new RPGCommandBase();
 				new HelpCommand();
-                event.getSender().sendMessage(ChatUtil.color("&bRPG Addon reloaded!"));
             }
 		}.runTaskLater(plugin, 20);
 
 		// Re-Enable all modules for clean start
 		plugin.getModuleManager().enableModules();
-	}
+
+        event.getSender().sendMessage(ChatUtil.color("&bRPG Addon reloaded!"));
+    }
 }
