@@ -30,11 +30,11 @@ public class HandleWorldEventDisplayListener implements Listener {
     public void onWorldSwitch(final PlayerChangedWorldEvent event) {
         final Player player = event.getPlayer();
 
-        for (WorldEvent worldEvent : index.getActiveIn(event.getFrom())) {
+        for (WorldEvent worldEvent : new ArrayList<>(index.getActiveIn(event.getFrom()))) {
             service.removeViewer(worldEvent, player);
         }
 
-        for (WorldEvent worldEvent : index.getActiveIn(player.getWorld())) {
+        for (WorldEvent worldEvent : new ArrayList<>(index.getActiveIn(player.getWorld()))) {
             service.addViewer(worldEvent, player);
             service.sendWorldEventRunningMessage(worldEvent, player);
         }
@@ -42,7 +42,7 @@ public class HandleWorldEventDisplayListener implements Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
-        for (WorldEvent worldEvent : index.getActiveIn(event.getPlayer().getWorld())) {
+        for (WorldEvent worldEvent : new ArrayList<>(index.getActiveIn(event.getPlayer().getWorld()))) {
             service.addViewer(worldEvent, event.getPlayer());
             service.sendWorldEventRunningMessage(worldEvent, event.getPlayer());
         }
@@ -50,7 +50,7 @@ public class HandleWorldEventDisplayListener implements Listener {
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent event) {
-        for (WorldEvent worldEvent : index.getActiveIn(event.getPlayer().getWorld())) {
+        for (WorldEvent worldEvent : new ArrayList<>(index.getActiveIn(event.getPlayer().getWorld()))) {
             service.removeViewer(worldEvent, event.getPlayer());
         }
     }
