@@ -7,6 +7,8 @@ import com.projectkorra.rpg.ProjectKorraRPG;
 
 public class TableCreator extends DBConnection {
     public static final String RPG_PLAYER_TABLE = "pkrpg_players";
+    public static final String RPG_PLAYER_ATTRIBUTES_TABLE = "pkrpg_players_attributes";
+    public static final String RPG_PLAYER_XP_LOG_TABLE = "pkrpg_xp_log";
     public static final String RPG_SCHEDULE_TABLE = "pkrpg_schedule";
     public static final String RPG_AVATAR_TABLE = "pkrpg_avatars";
     public static final String RPG_PAST_LIVES_TABLE = "pkrpg_pastlives";
@@ -16,6 +18,7 @@ public class TableCreator extends DBConnection {
         this.createScheduleTable();
         this.createRpgAvatarTable();
         this.createRpgPastLivesTable();
+        this.createRpgPlayerAttributesTable();
     }
 
     private void createRpgPlayerTable() {
@@ -24,9 +27,10 @@ public class TableCreator extends DBConnection {
                 ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_PLAYER_TABLE + " table");
 
                 final String query = "CREATE TABLE `" + RPG_PLAYER_TABLE + "` ("
-                        + "`uuid` varchar(36) NOT NULL,"
+                        + "`uuid` VARCHAR(36) NOT NULL,"
+                        + "`level` INT NOT NULL DEFAULT 1"
                         + "`xp` INT NOT NULL DEFAULT 0,"
-                        + "`level` INT NOT NULL DEFAULT 1,"
+                        + "`skill_points` INT NOT NULL DEFAULT 0,"
                         + "PRIMARY KEY (`uuid`),"
                         + "FOREIGN KEY (`uuid`) REFERENCES `pk_players`(`uuid`) ON DELETE CASCADE"
                         + ");";
@@ -39,8 +43,9 @@ public class TableCreator extends DBConnection {
 
                 final String query = "CREATE TABLE " + RPG_PLAYER_TABLE + "("
                         + "uuid TEXT NOT NULL, "
+                        + "level INTEGER NOT NULL DEFAULT 1"
                         + "xp INTEGER NOT NULL DEFAULT 0, "
-                        + "level INTEGER NOT NULL DEFAULT 1, "
+                        + "skill_points INTEGER NOT NULL DEFAULT 0,"
                         + "PRIMARY KEY (uuid), "
                         + "FOREIGN KEY (uuid) REFERENCES pk_players(uuid) ON DELETE CASCADE"
                         + ");";
@@ -48,6 +53,33 @@ public class TableCreator extends DBConnection {
                 sql.modifyQuery(query, false);
             }
         }
+    }
+
+    private void createRpgPlayerAttributesTable() {
+        if (sql.tableExists(RPG_PLAYER_ATTRIBUTES_TABLE)) return;
+
+        ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_PLAYER_ATTRIBUTES_TABLE + " table");
+        final String query;
+        if (sql instanceof MySQL) {
+            query = "CREATE TABLE `" + RPG_PLAYER_ATTRIBUTES_TABLE + "` ("
+                    + "`uuid` VARCHAR(36) NOT NULL,"
+                    + "`ability_key` VARCHAR(64) NOT NULL,"
+                    + "`attribute_key` VARCHAR(64) NOT NULL,"
+                    + "`points` INT NOT NULL DEFAULT 0"
+                    + "PRIMARY KEY (`uuid`, `ability_key`, `attribute_key`)"
+                    + "); ENGINE=InnoDB";
+
+        } else {
+            query = "CREATE TABLE " + RPG_PLAYER_ATTRIBUTES_TABLE + "("
+                    + "uuid TEXT NOT NULL,"
+                    + "ability_key TEXT NOT NULL,"
+                    + "attribute_key TEXT NOT NULL,"
+                    + "points INTEGER NOT NULL DEFAULT 0"
+                    + "PRIMARY KEY (uuid, ability_key, attribute_key),"
+                    + "); ENGINE=InnoDB";
+
+        }
+        sql.modifyQuery(query);
     }
 
     private void createScheduleTable() {
