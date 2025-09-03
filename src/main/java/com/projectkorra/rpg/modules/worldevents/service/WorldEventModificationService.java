@@ -18,7 +18,7 @@ import org.bukkit.World;
  * the world event's configuration file to the abilities based on their context (element, ability name, attribute name)
  * Has to listen to the {@link AbilityRecalculateAttributeEvent} to function.
  */
-public class WorldEventModificationService {
+public final class WorldEventModificationService {
     private final ActiveWorldEventIndex activeEventsIndex;
 
     public WorldEventModificationService(final ActiveWorldEventIndex activeEventsIndex) {

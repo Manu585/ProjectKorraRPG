@@ -9,6 +9,7 @@ import com.projectkorra.rpg.modules.worldevents.WorldEventModule;
 import java.util.List;
 
 public class ModuleManager {
+    private final ProjectKorraRPG plugin;
 	private final List<Module> modules;
 
 	private final WorldEventModule worldEventModule;
@@ -17,6 +18,8 @@ public class ModuleManager {
 	private final ElementAssignModule elementAssignModule;
 
 	public ModuleManager(ProjectKorraRPG plugin) {
+        this.plugin = plugin;
+
 		this.worldEventModule = new WorldEventModule(plugin);
 		this.levelingModuleModule = new LevelingModule(plugin);
 		this.avatarCycleModule = new AvatarCycleModule(plugin);
@@ -31,17 +34,26 @@ public class ModuleManager {
 	}
 
 	public void enableModules() {
-		for (Module module : modules) {
-			if (module.isEnabled()) {
-				module.enable();
-			}
-		}
+        for (Module module : modules) {
+            if (module.isEnabled()) {
+                try {
+                    module.enable();
+                } catch (Throwable t) {
+                    plugin.getLogger().severe("[Module: " + module.getName() +"] enable failed: " + t);
+                }
+            }
+        }
 	}
 
 	public void disableModules() {
-		for (Module module : modules) {
-			module.disable();
-		}
+        for (int i = modules.size() - 1; i >= 0; i--) {
+            Module module = modules.get(i);
+            try {
+                module.disable();
+            } catch (Throwable t) {
+                plugin.getLogger().severe("[Module: " + module.getName() + "] disable failed: " + t);
+            }
+        }
 	}
 
 	public List<Module> getModules() {

@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class ActiveWorldEvent {
+public final class ActiveWorldEvent {
     private final WorldEvent worldEvent;
     private final Set<UUID> viewers = new HashSet<>();
 

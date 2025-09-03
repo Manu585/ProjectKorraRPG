@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class WorldEventBuilder {
+public final class WorldEventBuilder {
     private NamespacedKey key;
     private String title;
     private Long duration;

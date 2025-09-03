@@ -25,7 +25,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class WorldEventLoader {
+public final class WorldEventLoader {
     private final ProjectKorraRPG plugin;
 
     public WorldEventLoader(ProjectKorraRPG plugin) {

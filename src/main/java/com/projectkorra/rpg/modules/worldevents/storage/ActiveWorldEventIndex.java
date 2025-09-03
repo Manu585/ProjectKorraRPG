@@ -6,7 +6,7 @@ import org.bukkit.World;
 
 import java.util.*;
 
-public class ActiveWorldEventIndex {
+public final class ActiveWorldEventIndex {
     private final Map<WorldEvent, ActiveWorldEvent> activeWorldEventMap = new HashMap<>();
     private final Map<UUID, Set<WorldEvent>> activeWorldEventsByWorld = new HashMap<>();
 

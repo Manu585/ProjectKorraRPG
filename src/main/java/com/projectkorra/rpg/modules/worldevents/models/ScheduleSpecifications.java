@@ -3,7 +3,7 @@ package com.projectkorra.rpg.modules.worldevents.models;
 import java.time.Duration;
 import java.time.LocalTime;
 
-public class ScheduleSpecifications {
+public final class ScheduleSpecifications {
     public enum Calendar {
         REAL_DAYS,
         IN_GAME_DAYS

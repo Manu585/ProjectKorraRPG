@@ -5,7 +5,7 @@ import org.bukkit.NamespacedKey;
 
 import java.util.*;
 
-public class WorldEventRegistry {
+public final class WorldEventRegistry {
     private final Map<NamespacedKey, WorldEvent> loadedWorldEvents = new HashMap<>();
     private final Map<String, NamespacedKey> byPath = new HashMap<>();
 

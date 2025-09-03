@@ -13,7 +13,7 @@ import com.projectkorra.rpg.modules.worldevents.storage.WorldEventRegistry;
 import com.projectkorra.rpg.modules.worldevents.util.BossBarCleanup;
 import org.bukkit.event.HandlerList;
 
-public class WorldEventModule extends Module {
+public final class WorldEventModule extends Module {
     private WorldEventService worldEventService;
     private WorldEventRegistry worldEventRegistry;
     private ActiveWorldEventIndex activeWorldEventIndex;
