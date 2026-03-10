@@ -1,6 +1,7 @@
 package com.projectkorra.rpg.modules.worldevents.schedule.strategies.util;
 
 public enum ScheduleType {
+
 	REAL_DAYS,
 	IN_GAME_DAYS;
 
@@ -23,4 +24,5 @@ public enum ScheduleType {
 
 		return null;
 	}
+
 }

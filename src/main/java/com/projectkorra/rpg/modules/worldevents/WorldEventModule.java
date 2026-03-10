@@ -8,48 +8,45 @@ import com.projectkorra.rpg.modules.worldevents.methods.WorldEventModificationSe
 import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduler;
 import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
 import org.bukkit.event.HandlerList;
-
-import java.util.ArrayList;
+import org.bukkit.plugin.Plugin;
 
 public class WorldEventModule extends Module {
+
+	private WorldEventRegistry registry;
 	private WorldEventModificationListener modificationListener;
 	private WorldEventModificationService modificationService;
-
 	private WorldEventScheduleListener scheduleListener;
 	private WorldEventScheduler worldEventScheduler;
 	private ScheduleStorage scheduleStorage;
 
-	public WorldEventModule() {
-		super("WorldEvents");
+	public WorldEventModule(Plugin plugin) {
+		super(plugin, "WorldEvents");
 	}
 
 	@Override
 	public void enable() {
 		getPlugin().getLogger().info("Enabling WorldEvent module...");
 
-		// Initialize all valid WorldEvents found in each config file in the WorldEvents directory
-		WorldEvent.initAllWorldEvents();
+		// Create the registry and load all events
+		this.registry = new WorldEventRegistry(getPlugin());
+		this.registry.loadAllEvents(); // March 10th, Manu - Perhaps CompletableFuture for non-blocking I/O
 
-		// Create ModificationService for Listener
-		this.modificationService = new WorldEventModificationService();
+		// Create services
+		this.modificationService = new WorldEventModificationService(getPlugin(), registry);
+		this.scheduleStorage = new ScheduleStorage(getPlugin());
 
-		// Contains necessary methods for DB data retrieval
-		this.scheduleStorage = new ScheduleStorage();
+		// Create listeners and scheduler
+		this.scheduleListener = new WorldEventScheduleListener();
+		this.worldEventScheduler = new WorldEventScheduler(getPlugin(), registry, scheduleStorage);
+		this.scheduleListener.setScheduler(this.worldEventScheduler);
 
-		// Scheduler to make events start based on config
-		this.worldEventScheduler = new WorldEventScheduler(this.scheduleListener, this.scheduleStorage);
-
-		// Create and Register Modification Listener
 		this.modificationListener = new WorldEventModificationListener(this.modificationService);
-		this.scheduleListener = new WorldEventScheduleListener(this.worldEventScheduler);
 
-		// Register Commands
-		new WorldEventCommand();
+		// Register commands
+		new WorldEventCommand(registry);
 
-		registerListeners(
-				this.modificationListener,
-				this.scheduleListener
-		);
+		// Register listeners
+		registerListeners(this.modificationListener, this.scheduleListener);
 
 		getPlugin().getLogger().info("WorldEvent module enabled successfully!");
 	}
@@ -58,35 +55,30 @@ public class WorldEventModule extends Module {
 	public void disable() {
 		getPlugin().getLogger().info("Disabling WorldEvent module...");
 
-		// Cleanup Scheduler
 		if (this.worldEventScheduler != null) {
 			this.worldEventScheduler.cleanup();
 			this.worldEventScheduler = null;
 		}
 
-		// Stop all active events
-		try {
-			new ArrayList<>(WorldEvent.getActiveEvents()).forEach(WorldEvent::stopEvent);
-		} catch (Exception e) {
-			getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());
+		if (this.registry != null) {
+			this.registry.clear();
 		}
 
-		// Unregister ModificationListener
 		if (this.modificationListener != null) {
 			HandlerList.unregisterAll(this.modificationListener);
 			this.modificationListener = null;
 		}
 
-		// Clear Worldevent maps
-		WorldEvent.getActiveEvents().clear();
-		WorldEvent.getAllEvents().clear();
-		WorldEvent.getAffectedPlayers().clear();
+		if (this.scheduleListener != null) {
+			HandlerList.unregisterAll(this.scheduleListener);
+			this.scheduleListener = null;
+		}
 
 		getPlugin().getLogger().info("WorldEvent module disabled successfully!");
 	}
 
-	public WorldEventModificationListener getModificationListener() {
-		return modificationListener;
+	public WorldEventRegistry getRegistry() {
+		return registry;
 	}
 
 	public WorldEventModificationService getModificationService() {

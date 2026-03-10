@@ -3,15 +3,19 @@ package com.projectkorra.rpg.util;
 import com.google.common.base.Strings;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 public class ChatUtil {
+
 	public static void sendBrandingMessage(final CommandSender receiver, final String message) {
 		if (Strings.isNullOrEmpty(ChatColor.stripColor(message))) return;
-
 		sendBrandingMessage(receiver, TextComponent.fromLegacyText(com.projectkorra.projectkorra.util.ChatUtil.color(message)));
 	}
 
@@ -41,12 +45,12 @@ public class ChatUtil {
 		FileConfiguration coreLanguageConfig = com.projectkorra.projectkorra.configuration.ConfigManager.languageConfig.get();
 		FileConfiguration addonLanguageConfig = ConfigManager.languageConfig.get();
 
-		ChatColor coreColor  = ChatColor.of(coreLanguageConfig.getString("Chat.Branding.Color", "GOLD").toUpperCase());
+		ChatColor coreColor = ChatColor.of(coreLanguageConfig.getString("Chat.Branding.Color", "GOLD").toUpperCase());
 		ChatColor addonColor = ChatColor.of(addonLanguageConfig.getString("Chat.Branding.Color", "LIGHT_PURPLE").toUpperCase());
 
-		String start 	 = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Prefix", "");
-		String suffix 	 = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Suffix", " \u00BB ");
-		String coreText  = coreLanguageConfig.getString("Chat.Branding.ChatPrefix.Main", "ProjectKorra");
+		String start = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Prefix", "");
+		String suffix = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Suffix", " \u00BB ");
+		String coreText = coreLanguageConfig.getString("Chat.Branding.ChatPrefix.Main", "ProjectKorra");
 		String addonText = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Main", "RPG");
 
 		String prefix = addonColor + start + coreColor + coreText + addonColor + addonText + addonColor + suffix;
@@ -77,4 +81,5 @@ public class ChatUtil {
 			((Player) receiver).spigot().sendMessage(new TextComponent(prefixComponent, messageComponent));
 		}
 	}
+
 }

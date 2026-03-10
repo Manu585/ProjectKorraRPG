@@ -2,20 +2,19 @@ package com.projectkorra.rpg.modules.randomavatar.commands;
 
 import com.projectkorra.rpg.commands.RPGCommand;
 import com.projectkorra.rpg.modules.randomavatar.manager.AvatarManager;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class AvatarCommand extends RPGCommand {
+
 	private final AvatarManager avatarManager;
 
     public AvatarCommand(AvatarManager avatarManager) {
         super("avatar", "/bending rpg avatar <Player>", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[]{"avatar", "av", "avy"});
-
 		this.avatarManager = avatarManager;
 	}
 
@@ -41,8 +40,8 @@ public class AvatarCommand extends RPGCommand {
 		if (target == null) {
 			sender.sendMessage(ChatColor.RED + "Player not found!");
 		} else {
-			boolean succesful = this.avatarManager.makeAvatar(target.getUniqueId());
-			if (!succesful) {
+			boolean successful = this.avatarManager.makeAvatar(target.getUniqueId());
+			if (!successful) {
 				sender.sendMessage(ChatColor.RED + "Failed to declare avatar!");
 			} else {
 				sender.sendMessage(ChatColor.DARK_PURPLE + target.getName() + " has been declared the Avatar!");
@@ -59,4 +58,5 @@ public class AvatarCommand extends RPGCommand {
 		}
 		return players;
 	}
+
 }

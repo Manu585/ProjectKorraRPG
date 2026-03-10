@@ -2,16 +2,20 @@ package com.projectkorra.rpg.modules.worldevents.commands;
 
 import com.projectkorra.rpg.commands.RPGCommand;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
+import com.projectkorra.rpg.modules.worldevents.WorldEventRegistry;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class WorldEventCommand extends RPGCommand {
-	public WorldEventCommand() {
+
+	private final WorldEventRegistry registry;
+
+	public WorldEventCommand(WorldEventRegistry registry) {
 		super("event", "/bending rpg event start <Event>", "Starts a world event", new String[]{"event", "e", "ev"});
+		this.registry = registry;
 	}
 
 	@Override
@@ -26,32 +30,25 @@ public class WorldEventCommand extends RPGCommand {
 			return;
 		}
 
-		if (args.get(0).equalsIgnoreCase("start")) {
-			WorldEvent we = WorldEvent.getAllEvents().get(args.get(1).toLowerCase());
+		String action = args.get(0);
+		String eventName = args.get(1);
 
+		if (action.equalsIgnoreCase("start")) {
+			WorldEvent we = registry.getEvent(eventName);
 			if (we == null) {
-				sender.sendMessage("WorldEvent '" + args.get(1) + "' not found.");
+				sender.sendMessage("WorldEvent '" + eventName + "' not found.");
 			} else {
 				we.startEvent();
 			}
 
-		} else if (args.get(0).equalsIgnoreCase("stop")) {
-			if (args.get(1) != null) {
-				WorldEvent we = WorldEvent.getAllEvents().get(args.get(1).toLowerCase());
-
-				if (we == null) {
-					sender.sendMessage("WorldEvent '" + args.get(1) + "' not found.");
-				} else {
-					we.stopEvent();
-				}
-
+		} else if (action.equalsIgnoreCase("stop")) {
+			WorldEvent we = registry.getEvent(eventName);
+			if (we == null) {
+				sender.sendMessage("WorldEvent '" + eventName + "' not found.");
 			} else {
-				for (WorldEvent worldEvent : WorldEvent.getActiveEvents()) {
-					if (worldEvent.getWorld() == player.getWorld()) {
-						worldEvent.stopEvent();
-					}
-				}
+				we.stopEvent();
 			}
+
 		} else {
 			help(sender, true);
 		}
@@ -62,9 +59,10 @@ public class WorldEventCommand extends RPGCommand {
 		if (args.isEmpty()) {
 			return Arrays.asList("start", "stop");
 		}
-		if (args.size() == 1 && args.getFirst().equalsIgnoreCase("start") || args.size() == 1 && args.getFirst().equalsIgnoreCase("stop")) {
-			return WorldEvent.getAllEvents().keySet().stream().sorted().toList();
+		if (args.size() == 1 && (args.getFirst().equalsIgnoreCase("start") || args.getFirst().equalsIgnoreCase("stop"))) {
+			return registry.getAllEvents().keySet().stream().sorted().toList();
 		}
 		return Collections.emptyList();
 	}
+
 }

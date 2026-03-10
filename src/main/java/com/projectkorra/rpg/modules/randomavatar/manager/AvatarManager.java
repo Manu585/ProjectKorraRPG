@@ -7,18 +7,10 @@ import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.OfflineBendingPlayer;
 import com.projectkorra.projectkorra.storage.DBConnection;
-import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.storage.TableCreator;
 import com.projectkorra.rpg.util.ChatUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,14 +19,27 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class AvatarManager {
-    private final JavaPlugin plugin = ProjectKorraRPG.getPlugin();
+
+    private final Plugin plugin;
 
     // In-memory caches
-    public final Set<OfflinePlayer> recentPlayers;
+    private final Set<OfflinePlayer> recentPlayers;
     private Set<OfflinePlayer> avatars;
 
     // Configuration
@@ -52,13 +57,14 @@ public class AvatarManager {
     private final Set<Element> avatarElements = new HashSet<>();
     private final Set<Element.SubElement> subElementBlacklist = new HashSet<>();
 
-    public AvatarManager() {
+    public AvatarManager(Plugin plugin) {
+        this.plugin = plugin;
+
         FileConfiguration config = ConfigManager.defaultConfig.get();
         enabled = config.getBoolean("Modules.RandomAvatar.Enabled");
         recentPlayers = new HashSet<>();
         maxAvatars = config.getInt("Modules.RandomAvatar.MaxAvatars");
         avatarDuration = RPGMethods.periodStringToDuration(config.getString("Modules.RandomAvatar.AvatarDuration"));
-        plugin.getLogger().info("Avatar selection: Avatar duration set to " + avatarDuration + " hours.");
         loseAvatarOnDeath = config.getBoolean("Modules.RandomAvatar.LoseAvatarOnDeath");
         loseOnAvatarStateDeath = config.getBoolean("Modules.RandomAvatar.OnlyLoseAvatarOnAvatarStateDeath");
         includeAllSubElements = config.getBoolean("Modules.RandomAvatar.IncludeAllSubElements");

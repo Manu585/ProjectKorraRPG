@@ -1,35 +1,23 @@
 package com.projectkorra.rpg.configuration;
 
-import com.projectkorra.rpg.ProjectKorraRPG;
+import java.io.File;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import java.io.File;
+import org.bukkit.plugin.Plugin;
 
 public class Config {
 
-    private final ProjectKorraRPG plugin;
-
+    private final Plugin plugin;
     private final File file;
     private final FileConfiguration config;
 
-    /**
-     * Creates a new {@link Config} with the file being the configuration file.
-     *
-     * @param file The file to create/load
-     */
-    public Config(File file) {
-        this.plugin = ProjectKorraRPG.getPlugin();
+    public Config(Plugin plugin, File file) {
+        this.plugin = plugin;
         this.file = new File(plugin.getDataFolder() + File.separator + file);
         this.config = YamlConfiguration.loadConfiguration(this.file);
         reload();
     }
 
-    /**
-     * Creates a file for the {@link FileConfiguration} object. If there are
-     * missing folders, this method will try to create them before create a file
-     * for the config.
-     */
     public void create() {
         if (!file.getParentFile().exists()) {
             try {
@@ -45,26 +33,17 @@ public class Config {
             try {
                 if (file.createNewFile()) {
                     plugin.getLogger().info("Generating new " + file.getName() + "!");
-                };
+                }
             } catch (Exception e) {
                 plugin.getLogger().info("Failed to generate " + file.getName() + "!" + e.getMessage());
             }
         }
     }
 
-    /**
-     * Gets the {@link FileConfiguration} object from the {@link Config}.
-     *
-     * @return the file configuration object
-     */
     public FileConfiguration get() {
         return config;
     }
 
-    /**
-     * Reloads the {@link FileConfiguration} object. If the config object does
-     * not exist it will run {@link #create()} first before loading the config.
-     */
     public void reload() {
         create();
         try {
@@ -74,11 +53,6 @@ public class Config {
         }
     }
 
-    /**
-     * Saves the {@link FileConfiguration} object.
-     * {@code config.options().copyDefaults(true)} is called before saving the
-     * config.
-     */
     public void save() {
         try {
             config.options().copyDefaults(true);

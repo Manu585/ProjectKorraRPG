@@ -2,74 +2,55 @@ package com.projectkorra.rpg.modules.worldevents.util.display.bossbar;
 
 import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
-public class BossBarDisplay implements IWorldEventDisplay {
-	private final WorldEventBossBar worldEventBossBar;
+public class BossBarDisplay implements WorldEventDisplay {
+
 	private final BarColor barColor;
 	private final BarStyle barStyle;
 	private final boolean smooth;
+	private final String title;
 
-	/**
-	 *
-	 * @param barColor Color of BossBar
-	 * @param barStyle Style of BossBar
-	 * @param smooth   <code>true</code> Refresh every tick <code>else</code> every second
-	 */
+	private BossBar bossBar;
+
 	public BossBarDisplay(String title, BarColor barColor, BarStyle barStyle, boolean smooth) {
+		this.title = title;
 		this.barColor = barColor;
 		this.barStyle = barStyle;
 		this.smooth = smooth;
-
-		this.worldEventBossBar = new WorldEventBossBar(ChatUtil.color(title), barColor, barStyle, smooth);
 	}
 
 	@Override
 	public void startDisplay(WorldEvent event) {
-		event.setWorldEventBossBar(getWorldEventBossBar());
+		this.bossBar = Bukkit.createBossBar(ChatUtil.color(title), barColor, barStyle);
 
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (WorldEvent.getAffectedPlayers().contains(player)) {
-				event.getWorldEventBossBar().getBossBar().addPlayer(player);
-			}
+		for (Player player : event.getAffectedPlayers()) {
+			bossBar.addPlayer(player);
 		}
 	}
 
 	@Override
 	public void updateDisplay(WorldEvent event, double progress) {
-		if (event.getWorldEventBossBar() != null && event.getWorldEventBossBar().getBossBar() != null) {
-			event.getWorldEventBossBar().getBossBar().setProgress(progress);
+		if (bossBar != null) {
+			bossBar.setProgress(Math.max(0.0, Math.min(1.0, progress)));
 		}
 	}
 
 	@Override
 	public void stopDisplay(WorldEvent event) {
-		if (event.getWorldEventBossBar() != null && event.getWorldEventBossBar().getBossBar() != null) {
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (WorldEvent.getAffectedPlayers().contains(player)) {
-					event.getWorldEventBossBar().getBossBar().removePlayer(player);
-				}
-			}
+		if (bossBar != null) {
+			bossBar.removeAll();
+			bossBar = null;
 		}
-	}
-
-	public WorldEventBossBar getWorldEventBossBar() {
-		return worldEventBossBar;
-	}
-
-	public BarColor getBarColor() {
-		return barColor;
-	}
-
-	public BarStyle getBarStyle() {
-		return barStyle;
 	}
 
 	public boolean isSmooth() {
 		return smooth;
 	}
+
 }

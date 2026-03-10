@@ -2,12 +2,16 @@ package com.projectkorra.rpg.configuration;
 
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.configuration.ConfigType;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
-
-import java.io.File;
-import java.util.*;
+import org.bukkit.plugin.Plugin;
 
 public class ConfigManager {
     private static final ConfigType DEFAULT = new ConfigType("Default");
@@ -18,10 +22,10 @@ public class ConfigManager {
     public static Config languageConfig;
     public static Config sozinsCometConfig;
 
-    public ConfigManager() {
-        defaultConfig = new Config(new File("config.yml"));
-        languageConfig = new Config(new File("language.yml"));
-        sozinsCometConfig = new Config(new File("WorldEvents/SozinsComet.yml"));
+    public ConfigManager(Plugin plugin) {
+        defaultConfig = new Config(plugin, new File("config.yml"));
+        languageConfig = new Config(plugin, new File("language.yml"));
+        sozinsCometConfig = new Config(plugin, new File("WorldEvents/SozinsComet.yml"));
 
         configCheck(DEFAULT);
         configCheck(LANGUAGE);
@@ -78,79 +82,36 @@ public class ConfigManager {
 
             config.addDefault("Modules.ElementAssignments.Enabled", true);
             config.addDefault("Modules.ElementAssignments.Default", "None");
-            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Enabled", true); // Allow changing element on death
-            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Chance", 0.2); // 20% chance to change element on death if
-            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Bypass", false); // Allow bypassing cooldowns for changing
+            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Enabled", true);
+            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Chance", 0.2);
+            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Bypass", false);
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Permission", "projectkorra.rpg.elementassign.bypass");
 
             Set<String> elementNames = new HashSet<>();
 
-            addDefaultElementAssignGroup("None", // Group Name
-                    true, // Enabled
-                    List.of(), // Elements (none)
-                    0.05, // Default weight for None group
-                    "", // Prefix (no prefix for None)
-                    List.of(), // Commands to run (default empty)
-                    "" // Permission Group to assign
-            );
+            addDefaultElementAssignGroup("None", true, List.of(), 0.05, "", List.of(), "");
 
-            // Add all the base elements
-            addDefaultElementAssignGroup(Element.AIR.getName(), // Group Name (e.g. air)
-                    true, // Enabled
-                    List.of(Element.AIR.getName().toLowerCase()), // Elements (just the element itself)
-                    0.1, // Default weight for this element group
-                    "", // Prefix (can be overridden by the parent)
-                    List.of(), // Commands to run (default empty)
-                    "" // Permission Group to assign
-            );
+            addDefaultElementAssignGroup(Element.AIR.getName(), true, List.of(Element.AIR.getName().toLowerCase()), 0.1, "", List.of(), "");
             elementNames.add(Element.AIR.getName().toLowerCase());
 
             addDefaultElementAssignGroup(Element.SPIRITUAL.getName(), true, List.of(Element.AIR.getName().toLowerCase(), Element.SPIRITUAL.getName().toLowerCase()), 0.05, "", List.of(), "");
 
             addDefaultElementAssignGroup(Element.FLIGHT.getName(), true, List.of(Element.AIR.getName().toLowerCase(), Element.FLIGHT.getName().toLowerCase()), 0.01, "", List.of(), "");
 
-            addDefaultElementAssignGroup(Element.WATER.getName() + "_Standalone", // Group Name (e.g. water)
-                    false, // Enabled
-                    List.of(Element.WATER.getName().toLowerCase()), // Elements (just the element itself)
-                    0.1, // Default weight for this element group
-                    "", // Prefix (can be overridden by the parent)
-                    List.of(), // Commands to run (default empty)
-                    "" // Permission Group to assign
-            );
+            addDefaultElementAssignGroup(Element.WATER.getName() + "_Standalone", false, List.of(Element.WATER.getName().toLowerCase()), 0.1, "", List.of(), "");
             elementNames.add(Element.WATER.getName().toLowerCase());
 
-            addDefaultElementAssignGroup(Element.WATER.getName(), // Group Name (e.g. water)
-                    true, // Enabled
-                    List.of(Element.WATER.getName().toLowerCase(), Element.ICE.getName().toLowerCase() // Include ice as a sub-element of water
-                    ), 0.1, // Default weight for this element group
-                    "", // Prefix (can be overridden by the parent)
-                    List.of(), // Commands to run (default empty)
-                    "" // Permission Group to assign
-            );
+            addDefaultElementAssignGroup(Element.WATER.getName(), true,
+                    List.of(Element.WATER.getName().toLowerCase(), Element.ICE.getName().toLowerCase()), 0.1, "", List.of(), "");
 
-            addDefaultElementAssignGroup(Element.PLANT.getName(), // Group Name (e.g. plant)
-                    true, // Enabled
-                    List.of(Element.WATER.getName().toLowerCase(), // Parent element (e.g. Water)
-                            Element.PLANT.getName().toLowerCase() // The sub-element itself (e.g. Plant)
-                    ), // Elements (Water and Plant)
-                    0.05, // Default weight for this sub-element group
-                    "", // Prefix (can be overridden by the parent)
-                    List.of(), // Commands to run (default empty)
-                    "" // Permission Group to assign
-            );
+            addDefaultElementAssignGroup(Element.PLANT.getName(), true,
+                    List.of(Element.WATER.getName().toLowerCase(), Element.PLANT.getName().toLowerCase()), 0.05, "", List.of(), "");
 
             addDefaultElementAssignGroup(Element.BLOOD.getName(), true, List.of(Element.WATER.getName().toLowerCase(), Element.BLOOD.getName().toLowerCase()), 0.05, "", List.of(), "");
 
             addDefaultElementAssignGroup(Element.HEALING.getName(), true, List.of(Element.WATER.getName().toLowerCase(), Element.HEALING.getName().toLowerCase()), 0.05, "", List.of(), "");
 
-            addDefaultElementAssignGroup(Element.EARTH.getName(), // Group Name (e.g. earth)
-                    true, // Enabled
-                    List.of(Element.EARTH.getName().toLowerCase()), // Elements (just the element itself)
-                    0.1, // Default weight for this element group
-                    "", // Prefix (can be overridden by the parent)
-                    List.of(), // Commands to run (default empty)
-                    "" // Permission Group to assign
-            );
+            addDefaultElementAssignGroup(Element.EARTH.getName(), true, List.of(Element.EARTH.getName().toLowerCase()), 0.1, "", List.of(), "");
             elementNames.add(Element.EARTH.getName().toLowerCase());
 
             addDefaultElementAssignGroup(Element.METAL.getName(), true, List.of(Element.EARTH.getName().toLowerCase(), Element.METAL.getName().toLowerCase()), 0.05, "", List.of(), "");
@@ -159,14 +120,7 @@ public class ConfigManager {
 
             addDefaultElementAssignGroup(Element.LAVA.getName(), true, List.of(Element.EARTH.getName().toLowerCase(), Element.LAVA.getName().toLowerCase()), 0.05, "", List.of(), "");
 
-            addDefaultElementAssignGroup(Element.FIRE.getName(), // Group Name (e.g. fire)
-                    true, // Enabled
-                    List.of(Element.FIRE.getName().toLowerCase()), // Elements (just the element itself)
-                    0.1, // Default weight for this element group
-                    "", // Prefix (can be overridden by the parent)
-                    List.of(), // Commands to run (default empty)
-                    "" // Permission Group to assign
-            );
+            addDefaultElementAssignGroup(Element.FIRE.getName(), true, List.of(Element.FIRE.getName().toLowerCase()), 0.1, "", List.of(), "");
             elementNames.add(Element.FIRE.getName().toLowerCase());
 
             addDefaultElementAssignGroup(Element.LIGHTNING.getName(), true, List.of(Element.FIRE.getName().toLowerCase(), Element.LIGHTNING.getName().toLowerCase()), 0.05, "", List.of(), "");
@@ -178,39 +132,32 @@ public class ConfigManager {
             addDefaultElementAssignGroup(Element.CHI.getName(), true, List.of(Element.CHI.getName().toLowerCase()), 0.05, "", List.of(), "");
 
             Arrays.stream(Element.getAddonSubElements()).forEach(subElement -> {
-                // We handle parent element stuff here (No subelement) just so the order is nicer
-                // This way subelements are placed near their parent elements in the config file
                 if (subElement.getParentElement() == null) {
-                    // Skip if no parent element
                     return;
                 }
                 if (!elementNames.contains(subElement.getParentElement().getName().toLowerCase())) {
                     elementNames.add(subElement.getParentElement().getName().toLowerCase());
-                    addDefaultElementAssignGroup(subElement.getParentElement().getName().toLowerCase(), // Group Name
-                            true, // Enabled
-                            List.of(subElement.getParentElement().getName().toLowerCase()), // Elements (just the parent element itself)
-                            0.1, // Default weight for parent elements
-                            subElement.getParentElement().getName().toLowerCase(), // Prefix
-                            List.of(), // Commands to run (default empty)
-                            "" // Permission Group to assign
+                    addDefaultElementAssignGroup(subElement.getParentElement().getName().toLowerCase(),
+                            true,
+                            List.of(subElement.getParentElement().getName().toLowerCase()),
+                            0.1,
+                            subElement.getParentElement().getName().toLowerCase(),
+                            List.of(),
+                            ""
                     );
                 }
 
-                addDefaultElementAssignGroup(subElement.getName(), // Group Name (e.g. ice)
-                        true, // Enabled
-                        List.of(subElement.getParentElement().getName().toLowerCase(), // Parent element (e.g.// Water for Ice)
-                                subElement.getName().toLowerCase() // The sub-element itself (e.g. Ice)
-                        ), // Elements
-                        0.05, // Default weight for this sub-element group
-                        "", // Prefix (can be overridden by the parent)
-                        List.of(), // Commands to run (default empty)
-                        "" // Permission Group to assign
+                addDefaultElementAssignGroup(subElement.getName(),
+                        true,
+                        List.of(subElement.getParentElement().getName().toLowerCase(),
+                                subElement.getName().toLowerCase()
+                        ),
+                        0.05, "", List.of(), ""
                 );
             });
 
             // ------------------------------- WorldEvents  --------------------------------
             config.addDefault("Modules.WorldEvents.Enabled", true);
-
 
             // --------------------------------- Leveling  ----------------------------------
             config.addDefault("Modules.Leveling.Enabled", true);

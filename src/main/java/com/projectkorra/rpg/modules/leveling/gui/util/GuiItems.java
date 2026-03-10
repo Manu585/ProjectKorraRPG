@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class GuiItems {
+
     public static GuiItem glassPaneItem() {
         ItemStack glassPane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta glassPaneMeta = glassPane.getItemMeta();
@@ -23,4 +24,5 @@ public class GuiItems {
         vine.setItemMeta(vineMeta);
         return new GuiItem(vine);
     }
+
 }

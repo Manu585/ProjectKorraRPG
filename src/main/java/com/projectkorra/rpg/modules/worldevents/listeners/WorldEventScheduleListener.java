@@ -8,25 +8,29 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class WorldEventScheduleListener implements Listener {
-	private final WorldEventScheduler scheduler;
 
-	public WorldEventScheduleListener(WorldEventScheduler scheduler) {
+	private WorldEventScheduler scheduler;
+
+	public WorldEventScheduleListener() {}
+
+	public void setScheduler(WorldEventScheduler scheduler) {
 		this.scheduler = scheduler;
 	}
 
 	@EventHandler
 	public void onWorldEventStart(WorldEventStartEvent event) {
-		scheduler.setEventActive(event.getWorldEvent(), true);
+		if (scheduler != null) {
+			scheduler.setEventActive(event.getWorldEvent(), true);
+		}
 	}
 
 	@EventHandler
 	public void onWorldEventStop(WorldEventStopEvent event) {
+		if (scheduler == null) return;
+
 		WorldEvent worldEvent = event.getWorldEvent();
-
-		// Mark the event as inactive
 		scheduler.setEventActive(worldEvent, false);
-
-		// Reschedule it
 		scheduler.rescheduleEvent(worldEvent);
 	}
+
 }

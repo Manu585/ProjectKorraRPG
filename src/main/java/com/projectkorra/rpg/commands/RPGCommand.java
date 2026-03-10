@@ -2,13 +2,12 @@ package com.projectkorra.rpg.commands;
 
 import com.projectkorra.projectkorra.command.PKCommand;
 import com.projectkorra.projectkorra.command.SubCommand;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public abstract class RPGCommand implements SubCommand {
 

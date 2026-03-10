@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class WorldEventModificationListener implements Listener {
+
 	private final WorldEventModificationService modificationService;
 
 	public WorldEventModificationListener(WorldEventModificationService modificationService) {
@@ -26,4 +27,5 @@ public class WorldEventModificationListener implements Listener {
 			ability.recalculateAttributes();
 		}
 	}
+
 }

@@ -5,19 +5,30 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.ability.*;
+import com.projectkorra.projectkorra.ability.BloodAbility;
+import com.projectkorra.projectkorra.ability.CombustionAbility;
+import com.projectkorra.projectkorra.ability.CoreAbility;
+import com.projectkorra.projectkorra.ability.FlightAbility;
+import com.projectkorra.projectkorra.ability.HealingAbility;
+import com.projectkorra.projectkorra.ability.IceAbility;
+import com.projectkorra.projectkorra.ability.LavaAbility;
+import com.projectkorra.projectkorra.ability.LightningAbility;
+import com.projectkorra.projectkorra.ability.MetalAbility;
+import com.projectkorra.projectkorra.ability.PlantAbility;
+import com.projectkorra.projectkorra.ability.SandAbility;
+import com.projectkorra.projectkorra.ability.SpiritualAbility;
 import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.modules.leveling.gui.util.GuiItems;
+import java.util.Set;
+import java.util.TreeSet;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 public class AbilityMenu extends ChestGui {
+
     private static final int WIDTH = 9;
     private static final int HEIGHT = 6;
 

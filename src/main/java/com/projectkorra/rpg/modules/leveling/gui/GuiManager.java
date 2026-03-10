@@ -1,24 +1,24 @@
 package com.projectkorra.rpg.modules.leveling.gui;
 
 import com.github.stefvanschie.inventoryframework.gui.type.util.Gui;
-import com.projectkorra.rpg.ProjectKorraRPG;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.plugin.Plugin;
 
 public class GuiManager {
-    private final ProjectKorraRPG plugin;
+
+    private final Plugin plugin;
     private final List<Gui> allGuis = new ArrayList<>();
 
-    public GuiManager(ProjectKorraRPG plugin) {
+    public GuiManager(Plugin plugin) {
         this.plugin = plugin;
     }
 
     public void init() {
-
+        // TODO: Initialize GUI components
     }
 
-    public ProjectKorraRPG getPlugin() {
+    public Plugin getPlugin() {
         return plugin;
     }
 

@@ -1,231 +1,160 @@
 package com.projectkorra.rpg.modules.worldevents;
 
-import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStartEvent;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
-import com.projectkorra.rpg.modules.worldevents.util.DisplayHelper;
-import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.BossBarDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.WorldEventBossBar;
-import com.projectkorra.rpg.modules.worldevents.util.display.chat.ChatDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.none.NoDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.scoreboard.ScoreboardDisplay;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.io.File;
-import java.util.*;
+import org.bukkit.scheduler.BukkitTask;
 
 public class WorldEvent {
-	private static HashMap<String, WorldEvent> ALL_EVENTS = new HashMap<>();
-	private static HashSet<WorldEvent> ACTIVE_EVENTS = new HashSet<>();
-	private static HashSet<Player> AFFECTED_PLAYERS = new HashSet<>();
 
+	private final Plugin plugin;
+	private final WorldEventRegistry registry;
 	private final NamespacedKey worldEventNamespacedKey;
 
 	private final String key;
-	private String title;
-	private long duration;
-	private World world;
-
-	private List<IWorldEventDisplay> displayMethods;
-	private List<World> disabledWorlds;
-
+	private final String title;
+	private final long duration;
+	private final World world;
+	private final List<WorldEventDisplay> displayMethods;
+	private final List<World> disabledWorlds;
 	private final FileConfiguration config;
 
-	private WorldEventBossBar worldEventBossBar;
+	private final Set<Player> affectedPlayers = new HashSet<>();
+	private BukkitTask timerTask;
 
-	public WorldEvent(String key, String title, long duration, List<World> disabledWorlds, FileConfiguration config, World world, List<IWorldEventDisplay> displayMethods) {
+	public WorldEvent(Plugin plugin, WorldEventRegistry registry, String key, String title, long duration,
+					  List<World> disabledWorlds, FileConfiguration config, World world,
+					  List<WorldEventDisplay> displayMethods) {
+		this.plugin = plugin;
+		this.registry = registry;
 		this.key = key;
 		this.title = title;
 		this.duration = duration;
 		this.disabledWorlds = disabledWorlds;
 		this.config = config;
 		this.world = world;
-		this.displayMethods = (displayMethods == null || displayMethods.isEmpty()) ? Collections.singletonList(new NoDisplay()) : new ArrayList<>(displayMethods);
-
-		this.worldEventNamespacedKey = new NamespacedKey(ProjectKorraRPG.getPlugin(), key);
+		this.displayMethods = (displayMethods == null || displayMethods.isEmpty())
+				? Collections.emptyList()
+				: List.copyOf(displayMethods);
+		this.worldEventNamespacedKey = new NamespacedKey(plugin, key);
 	}
 
 	public void startEvent() {
-		if (getDisabledWorlds().contains(world)) {
-			ProjectKorraRPG.getPlugin().getLogger().info("Couldn't start worldevent because world is a disabled world!");
+		if (disabledWorlds.contains(world)) {
+			plugin.getLogger().info("Couldn't start worldevent '" + key + "' because its world is disabled!");
 			return;
 		}
 
-		getActiveEvents().add(this);
-
+		registry.addActiveEvent(this);
 		Bukkit.getPluginManager().callEvent(new WorldEventStartEvent(this));
 
-		// Add all online players in the world to the Set
-		// And play Sound if user configured
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getWorld() == this.world) {
-				getAffectedPlayers().add(player);
-				if (getConfig().getBoolean("PlayEventStartSound")) {
-					String soundName = getConfig().getString("EventStart.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
-
-					Sound eventStartSound = Sound.valueOf(soundName);
-					float volume = (float) getConfig().getDouble("EventStart.Volume");
-					float pitch = (float) getConfig().getDouble("EventStart.Pitch");
-
-					player.getWorld().playSound(player.getLocation(), eventStartSound, volume, pitch);
-				}
+				affectedPlayers.add(player);
+				playStartSound(player);
 			}
 		}
 
-		// Start the display for the event
-		for (IWorldEventDisplay display : getDisplayMethods()) {
+		for (WorldEventDisplay display : displayMethods) {
 			display.startDisplay(this);
 		}
 
 		startWorldEventTimer();
 	}
 
-	/**
-	 * Stop active WorldEvent
-	 */
 	public void stopEvent() {
 		Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(this));
-		getActiveEvents().remove(this);
+		registry.removeActiveEvent(this);
 
-		// Play EventStop sound for each player in an active WorldEvent world
 		for (Player player : getWorld().getPlayers()) {
-			if (getAffectedPlayers().contains(player)) {
-				if (getConfig().getBoolean("PlayEventStopSound")) {
-					String soundName = getConfig().getString("EventStop.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
-
-					Sound eventStopSound = Sound.valueOf(soundName.toUpperCase());
-					float volume = (float) getConfig().getDouble("EventStop.Volume", 1.0);
-					float pitch = (float) getConfig().getDouble("EventStop.Pitch", 1.0);
-
-					player.getWorld().playSound(player.getLocation(), eventStopSound, volume, pitch);
-				}
+			if (affectedPlayers.contains(player)) {
+				playStopSound(player);
 			}
 		}
 
-		// Stop the display for the event
-		for (IWorldEventDisplay display : getDisplayMethods()) {
+		for (WorldEventDisplay display : displayMethods) {
 			display.stopDisplay(this);
 		}
+
+		if (timerTask != null && !timerTask.isCancelled()) {
+			timerTask.cancel();
+			timerTask = null;
+		}
+
+		affectedPlayers.clear();
 	}
 
-	// Updated WorldEvent display
 	public void updateDisplay(double progress) {
-		for (IWorldEventDisplay display : getDisplayMethods()) {
+		for (WorldEventDisplay display : displayMethods) {
 			display.updateDisplay(this, progress);
 		}
 	}
 
-	/**
-	 * Puts all WorldEvents from WorldEvents directory into the {@link WorldEvent#getAllEvents()} map
-	 */
-	public static void initAllWorldEvents() {
-		File worldEventsFolder = new File(ProjectKorraRPG.getPlugin().getDataFolder(), "WorldEvents");
-		if (!worldEventsFolder.exists() || !worldEventsFolder.isDirectory()) {
-			ProjectKorraRPG.getPlugin().getLogger().warning("WorldEvents folder was not found!");
-			return;
-		}
-
-		File[] worldEventsFiles = worldEventsFolder.listFiles(((dir, name) -> name.endsWith(".yml")));
-		if (worldEventsFiles == null || worldEventsFiles.length == 0) {
-			ProjectKorraRPG.getPlugin().getLogger().info("No WorldEvents were found.");
-			return;
-		}
-
-		// Iterate through all WorldEvent configurations
-		Arrays.stream(worldEventsFiles).parallel().forEach(file -> {
-			String eventKey = file.getName().toLowerCase().replace(".yml", ""); // Event key is file name without yml extension
-			FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-			String eventTitle = config.getString("Title", "&cConfig Title not defined!");
-			long duration = config.getLong("Duration", 1000);
-
-			String configWorldName = config.getString("World", null);
-			World world = (configWorldName == null ? null : Bukkit.getWorld(configWorldName));
-
-			List<IWorldEventDisplay> displayMethods = new ArrayList<>();
-
-			// BossBar-Display
-			if (config.getBoolean("DisplayMethods.BossBar.Enabled", false)) {
-				BarColor bossBarColor = DisplayHelper.convertStringToBarColor(config.getString("DisplayMethods.BossBar.Color", "RED"));
-				BarStyle bossBarStyle = DisplayHelper.convertStringToBarStyle(config.getString("DisplayMethods.BossBar.Style", "SOLID"));
-				boolean smoothBossBar = config.getBoolean("DisplayMethods.BossBar.Smooth", true);
-
-				displayMethods.add(new BossBarDisplay(eventTitle, bossBarColor, bossBarStyle, smoothBossBar));
-			}
-
-			// Chat-Display
-			if (config.getBoolean("DisplayMethods.Chat.Enabled", false)) {
-				String eventStartMessage = config.getString("DisplayMethods.Chat.EventStartMessage", "&cEventStartMessage not defined!");
-				String eventStopMessage = config.getString("DisplayMethods.Chat.EventStopMessage", "&cEventStopMessage not defined!");
-
-				displayMethods.add(new ChatDisplay(eventStartMessage, eventStopMessage));
-			}
-
-			// Scoreboard - Display
-			if (config.getBoolean("DisplayMethods.Scoreboard.Enabled", false)) {
-				displayMethods.add(new ScoreboardDisplay());
-			}
-
-			// Parse Disabled Worlds
-			List<String> disabledWorldsStringList = config.getStringList("DisabledWorlds");
-			List<World> disabledWorlds = new ArrayList<>();
-			if (!disabledWorldsStringList.isEmpty()) {
-				for (String worldName : disabledWorldsStringList) {
-					World w = Bukkit.getWorld(worldName);
-					if (w != null) {
-						disabledWorlds.add(w);
-					}
-				}
-			}
-
-			getAllEvents().put(eventKey, new WorldEvent(eventKey, eventTitle, duration, disabledWorlds, config, world, displayMethods));
-		});
-	}
-
 	private void startWorldEventTimer() {
-		final long duration = getDuration();
 		final long startTime = System.currentTimeMillis();
+		long tickInterval = findBossBarDisplay().map(BossBarDisplay::isSmooth).orElse(false) ? 1 : 20;
 
-		new BukkitRunnable() {
+		timerTask = new BukkitRunnable() {
 			@Override
 			public void run() {
-				long now = System.currentTimeMillis();
-				double elapsed = now - startTime;
+				double elapsed = System.currentTimeMillis() - startTime;
 				double progress = 1.0 - (elapsed / (double) duration);
 
 				if (progress <= 0.0) {
 					updateDisplay(0.0);
 					stopEvent();
-					this.cancel();
 					return;
 				}
 
 				updateDisplay(progress);
 			}
-		}.runTaskTimer(ProjectKorraRPG.getPlugin(), 0, getWorldEventBossBar().isSmooth() ? 1 : 20);
+		}.runTaskTimer(plugin, 0, tickInterval);
 	}
 
-	public static HashMap<String, WorldEvent> getAllEvents() {
-		return ALL_EVENTS;
+	private Optional<BossBarDisplay> findBossBarDisplay() {
+		return displayMethods.stream()
+				.filter(d -> d instanceof BossBarDisplay)
+				.map(d -> (BossBarDisplay) d)
+				.findFirst();
 	}
 
-	public static HashSet<WorldEvent> getActiveEvents() {
-		return ACTIVE_EVENTS;
+	private void playStartSound(Player player) {
+		if (!config.getBoolean("PlayEventStartSound", false)) return;
+		playSound(player, "EventStart");
 	}
 
-	public static HashSet<Player> getAffectedPlayers() {
-		return AFFECTED_PLAYERS;
+	private void playStopSound(Player player) {
+		if (!config.getBoolean("PlayEventStopSound", false)) return;
+		playSound(player, "EventStop");
 	}
+
+	private void playSound(Player player, String configSection) {
+		try {
+			String soundName = config.getString(configSection + ".Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
+			Sound sound = Sound.valueOf(soundName.toUpperCase());
+			float volume = (float) config.getDouble(configSection + ".Volume", 1.0);
+			float pitch = (float) config.getDouble(configSection + ".Pitch", 1.0);
+			player.getWorld().playSound(player.getLocation(), sound, volume, pitch);
+		} catch (IllegalArgumentException e) {
+			plugin.getLogger().warning("Invalid sound configured for " + configSection + " in event " + key);
+		}
+	}
+
+	// --- Getters ---
 
 	public NamespacedKey getWorldEventNamespacedKey() {
 		return worldEventNamespacedKey;
@@ -247,7 +176,7 @@ public class WorldEvent {
 		return world;
 	}
 
-	public List<IWorldEventDisplay> getDisplayMethods() {
+	public List<WorldEventDisplay> getDisplayMethods() {
 		return displayMethods;
 	}
 
@@ -259,43 +188,12 @@ public class WorldEvent {
 		return config;
 	}
 
-	public WorldEventBossBar getWorldEventBossBar() {
-		return worldEventBossBar;
+	public Set<Player> getAffectedPlayers() {
+		return affectedPlayers;
 	}
 
-	public static void setAllEvents(HashMap<String, WorldEvent> allEvents) {
-		ALL_EVENTS = allEvents;
+	public WorldEventRegistry getRegistry() {
+		return registry;
 	}
 
-	public static void setActiveEvents(HashSet<WorldEvent> activeEvents) {
-		ACTIVE_EVENTS = activeEvents;
-	}
-
-	public static void setAffectedPlayers(HashSet<Player> affectedPlayers) {
-		AFFECTED_PLAYERS = affectedPlayers;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public void setDuration(long duration) {
-		this.duration = duration;
-	}
-
-	public void setWorld(World world) {
-		this.world = world;
-	}
-
-	public void setDisplayMethods(List<IWorldEventDisplay> displayMethods) {
-		this.displayMethods = displayMethods;
-	}
-
-	public void setDisabledWorlds(List<World> disabledWorlds) {
-		this.disabledWorlds = disabledWorlds;
-	}
-
-	public void setWorldEventBossBar(WorldEventBossBar worldEventBossBar) {
-		this.worldEventBossBar = worldEventBossBar;
-	}
 }

@@ -1,73 +1,44 @@
 package com.projectkorra.rpg;
 
-import net.luckperms.api.node.Node;
-import org.bukkit.entity.Player;
-
 import java.time.Duration;
-
-import static com.projectkorra.rpg.ProjectKorraRPG.luckPermsAPI;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RPGMethods {
-	private static final ProjectKorraRPG plugin = ProjectKorraRPG.getPlugin();
+
+	private static final Pattern DURATION_PATTERN = Pattern.compile("(\\d+)([wdhms])");
 
 	/**
-	 * @param player     Player who will lose permission
-	 * @param permission Permission to remove from the player as a string
-	 * @author CrashCringle
-	 * @Description This method is a simplified way of removing
-	 * Permissions to players via LuckPerms
-	 */
-	public static void removePermission(Player player, String permission) {
-		if (luckPermsAPI == null)
-			return;
-
-		luckPermsAPI.getUserManager().getUser(player.getUniqueId()).data()
-				.remove(Node.builder(permission).build());
-		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
-
-	}
-
-	/**
-	 * @param player     Player who will receive permission
-	 * @param permission Permission to give to the player as a string
-	 * @author CrashCringle
-	 * @Description This method is a simplified way of adding
-	 * Permissions to players via LuckPerms
-	 */
-	public static void addPermission(Player player, String permission) {
-		if (luckPermsAPI == null)
-			return;
-		luckPermsAPI.getUserManager().getUser(player.getUniqueId()).data()
-				.add(Node.builder(permission).build());
-		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
-	}
-
-	/**
-	 * @param period String to convert to duration
-	 * @return Duration in the period string
-	 * @author CrashCringle
-	 * @Description This method converts a period string like 3d4h to a duration object
+	 * Converts a period string like "3d4h5m10s" to a Duration object.
+	 * Supports: w (weeks), d (days), h (hours), m (minutes), s (seconds).
 	 */
 	public static Duration periodStringToDuration(String period) {
-		// Can be in the formats like: 1s, 1m, 1h, 1d, 2d1h10s etc etc.
 		Duration duration = Duration.ZERO;
 		if (period == null || period.isEmpty()) {
-			plugin.getLogger().info("Invalid period string: " + period);
+			Logger.getLogger("ProjectKorraRPG").warning("Invalid period string: " + period);
 			return duration;
 		}
-		String[] parts = period.split("(?<=\\D)(?=\\d)");
-		for (String part : parts) {
-			String unit = part.replaceAll("\\d", "");
-			double value = Double.parseDouble(part.replaceAll("\\D", ""));
+
+		Matcher matcher = DURATION_PATTERN.matcher(period.toLowerCase().trim());
+		while (matcher.find()) {
+			long value = Long.parseLong(matcher.group(1));
+			String unit = matcher.group(2);
 			duration = switch (unit) {
-				case "w" -> duration.plusHours((long) (value * 168));
-				case "d" -> duration.plusHours((long) (value * 24));
-				case "h" -> duration.plusHours((long) value);
-				case "m" -> duration.plusMinutes((long) value);
-				case "s" -> duration.plusSeconds((long) value);
+				case "w" -> duration.plusDays(value * 7);
+				case "d" -> duration.plusDays(value);
+				case "h" -> duration.plusHours(value);
+				case "m" -> duration.plusMinutes(value);
+				case "s" -> duration.plusSeconds(value);
 				default -> duration;
 			};
 		}
+
+		if (duration.isZero()) {
+			Logger.getLogger("ProjectKorraRPG").warning("Could not parse any duration from: " + period);
+		}
+
 		return duration;
 	}
+
 }

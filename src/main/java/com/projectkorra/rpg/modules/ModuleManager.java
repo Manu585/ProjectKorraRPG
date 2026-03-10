@@ -4,68 +4,66 @@ import com.projectkorra.rpg.modules.elementassignments.ElementAssignModule;
 import com.projectkorra.rpg.modules.leveling.LevelingModule;
 import com.projectkorra.rpg.modules.randomavatar.AvatarCycleModule;
 import com.projectkorra.rpg.modules.worldevents.WorldEventModule;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import org.bukkit.plugin.Plugin;
 
 public class ModuleManager {
-	private final List<Module> modules = new ArrayList<>();
 
 	private final WorldEventModule worldEventModule;
-	private final LevelingModule levelingModuleModule;
+	private final LevelingModule levelingModule;
 	private final AvatarCycleModule avatarCycleModule;
 	private final ElementAssignModule elementAssignModule;
 
-	public ModuleManager() {
-		modules.add(worldEventModule = new WorldEventModule());
-		modules.add(levelingModuleModule = new LevelingModule());
-		modules.add(avatarCycleModule = new AvatarCycleModule());
-		modules.add(elementAssignModule = new ElementAssignModule());
+	private final Set<Module> modules = new HashSet<>();
+
+	public ModuleManager(Plugin plugin) {
+		modules.add(worldEventModule = new WorldEventModule(plugin));
+		modules.add(levelingModule = new LevelingModule(plugin));
+		modules.add(avatarCycleModule = new AvatarCycleModule(plugin));
+		modules.add(elementAssignModule = new ElementAssignModule(plugin));
 	}
 
 	public void enableModules() {
 		for (Module module : modules) {
 			if (module.isEnabled()) {
-				module.enable();
+				try {
+					module.enable();
+				} catch (Exception e) {
+					module.getPlugin().getLogger().severe("Failed to enable module " + module.getName() + ": " + e.getMessage());
+				}
 			}
 		}
 	}
 
 	public void disableModules() {
 		for (Module module : modules) {
-			module.disable();
+			try {
+				module.disable();
+			} catch (Exception e) {
+				module.getPlugin().getLogger().severe("Failed to disable module " + module.getName() + ": " + e.getMessage());
+			}
 		}
 	}
 
-	public List<Module> getModules() {
+	public Set<Module> getModules() {
 		return modules;
 	}
 
 	public WorldEventModule getWorldEventsModule() {
-		if (worldEventModule.isEnabled()) {
-			return worldEventModule;
-		}
-		throw new IllegalStateException("WorldEvents Module is disabled! Enable it in config.yml");
+		return worldEventModule;
 	}
 
-	public LevelingModule getRpgLevelingModule() {
-		if (levelingModuleModule.isEnabled()) {
-			return levelingModuleModule;
-		}
-		throw new IllegalStateException("Level Module is disabled! Enable it in config.yml");
+	public LevelingModule getLevelingModule() {
+		return levelingModule;
 	}
 
-	public AvatarCycleModule getRandomAvatarModule() {
-		if (avatarCycleModule.isEnabled()) {
-			return avatarCycleModule;
-		}
-		throw new IllegalStateException("AvatarCycle Module is disabled! Enable it in config.yml");
+	public AvatarCycleModule getAvatarCycleModule() {
+		return avatarCycleModule;
 	}
 
 	public ElementAssignModule getElementAssignmentsModule() {
-		if (elementAssignModule.isEnabled()) {
-			return elementAssignModule;
-		}
-		throw new IllegalStateException("ElementAssign Module is disabled! Enable it in config.yml");
+		return elementAssignModule;
 	}
+
 }

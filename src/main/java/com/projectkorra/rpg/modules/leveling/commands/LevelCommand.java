@@ -2,11 +2,10 @@ package com.projectkorra.rpg.modules.leveling.commands;
 
 import com.projectkorra.rpg.commands.RPGCommand;
 import com.projectkorra.rpg.modules.leveling.gui.master.MainGui;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class LevelCommand extends RPGCommand {
 	public LevelCommand() {
@@ -31,4 +30,5 @@ public class LevelCommand extends RPGCommand {
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
 		return Collections.emptyList();
 	}
+
 }

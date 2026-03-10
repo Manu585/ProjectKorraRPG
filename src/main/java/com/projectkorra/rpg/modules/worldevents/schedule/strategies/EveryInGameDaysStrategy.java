@@ -3,12 +3,11 @@ package com.projectkorra.rpg.modules.worldevents.schedule.strategies;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduleStrategy;
 import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 
 public class EveryInGameDaysStrategy implements WorldEventScheduleStrategy {
 	private final LocalTime timeOfDay;
