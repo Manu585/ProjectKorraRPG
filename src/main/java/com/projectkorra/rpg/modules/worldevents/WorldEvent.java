@@ -2,8 +2,8 @@ package com.projectkorra.rpg.modules.worldevents;
 
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStartEvent;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
-import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.BossBarDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.bossbar.BossBarDisplay;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;

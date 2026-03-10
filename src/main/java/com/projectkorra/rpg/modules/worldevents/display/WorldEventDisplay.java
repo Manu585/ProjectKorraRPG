@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.worldevents.util.display;
+package com.projectkorra.rpg.modules.worldevents.display;
 
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 

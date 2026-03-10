@@ -3,7 +3,7 @@ package com.projectkorra.rpg.modules.worldevents.util;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 
-public class DisplayHelper {
+public class BossBarUtil {
 
 	public static BarColor convertStringToBarColor(String colorStr) {
 		if (colorStr == null) return BarColor.RED;

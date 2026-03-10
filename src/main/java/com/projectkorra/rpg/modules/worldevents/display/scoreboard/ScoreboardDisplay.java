@@ -1,7 +1,7 @@
-package com.projectkorra.rpg.modules.worldevents.util.display.scoreboard;
+package com.projectkorra.rpg.modules.worldevents.display.scoreboard;
 
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
 
 public class ScoreboardDisplay implements WorldEventDisplay {
 

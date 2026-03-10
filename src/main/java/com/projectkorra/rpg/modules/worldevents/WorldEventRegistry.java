@@ -1,10 +1,10 @@
 package com.projectkorra.rpg.modules.worldevents;
 
-import com.projectkorra.rpg.modules.worldevents.util.DisplayHelper;
-import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.BossBarDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.chat.ChatDisplay;
-import com.projectkorra.rpg.modules.worldevents.util.display.scoreboard.ScoreboardDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.BossBarUtil;
+import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.bossbar.BossBarDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.chat.ChatDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.scoreboard.ScoreboardDisplay;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,8 +98,8 @@ public class WorldEventRegistry {
         List<WorldEventDisplay> displayMethods = new ArrayList<>();
 
         if (config.getBoolean("DisplayMethods.BossBar.Enabled", false)) {
-            BarColor bossBarColor = DisplayHelper.convertStringToBarColor(config.getString("DisplayMethods.BossBar.Color", "RED"));
-            BarStyle bossBarStyle = DisplayHelper.convertStringToBarStyle(config.getString("DisplayMethods.BossBar.Style", "SOLID"));
+            BarColor bossBarColor = BossBarUtil.convertStringToBarColor(config.getString("DisplayMethods.BossBar.Color", "RED"));
+            BarStyle bossBarStyle = BossBarUtil.convertStringToBarStyle(config.getString("DisplayMethods.BossBar.Style", "SOLID"));
             boolean smoothBossBar = config.getBoolean("DisplayMethods.BossBar.Smooth", true);
             displayMethods.add(new BossBarDisplay(eventTitle, bossBarColor, bossBarStyle, smoothBossBar));
         }

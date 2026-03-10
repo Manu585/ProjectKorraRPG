@@ -1,8 +1,8 @@
-package com.projectkorra.rpg.modules.worldevents.util.display.bossbar;
+package com.projectkorra.rpg.modules.worldevents.display.bossbar;
 
 import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.util.display.WorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.display.WorldEventDisplay;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
